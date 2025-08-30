@@ -26,11 +26,11 @@ public class FishSpawner : MonoBehaviour
     //Algae
     [Header("Algae Settings")]
     public GameObject algaePrefab;
-    public int maxAlgaeCount = 7;
-    public float algaeY = 0f;       // vị trí Y (đáy)
-    public float algaeXSpacing = 2f; // khoảng cách tối thiểu giữa các cây tảo
-    public Vector2 algaeXRange = new Vector2(1f, 19f);
-    public float algaeSpawnInterval = 2f; // spawn mỗi 5 giây
+    public int maxAlgaeCount = 10;
+    public float algaeY = -4f;       // vị trí Y (đáy)
+    public float algaeXSpacing = 1f; // khoảng cách tối thiểu giữa các cây tảo
+    public Vector2 algaeXRange = new Vector2(-10f, 10f);
+    public float algaeSpawnInterval = 5f; // spawn mỗi 5 giây
 
     private float algaeTimer = 0f;
 
@@ -130,35 +130,24 @@ public class FishSpawner : MonoBehaviour
     }
     void TrySpawnAlgae()
     {
-        // kiểm tra giới hạn số lượng
+        // kiểm tra số lượng tảo hiện tại
         Algae[] allAlgae = FindObjectsOfType<Algae>();
         if (allAlgae.Length >= maxAlgaeCount) return;
 
-        const int maxAttempts = 10;
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        // random vị trí X trong khoảng
+        float xPos = Random.Range(algaeXRange.x, algaeXRange.y);
+
+        // tránh spawn quá gần cây tảo khác
+        foreach (Algae a in allAlgae)
         {
-            float xPos = Random.Range(algaeXRange.x, algaeXRange.y);
-
-            bool tooClose = false;
-            foreach (Algae a in allAlgae)
-            {
-                if (Mathf.Abs(a.transform.position.x - xPos) < algaeXSpacing)
-                {
-                    tooClose = true;
-                    break;
-                }
-            }
-
-            if (!tooClose)
-            {
-                // spawn tảo ở vị trí hợp lệ
-                Vector3 pos = new Vector3(xPos, algaeY, 0);
-                Instantiate(algaePrefab, pos, Quaternion.identity);
-                return;
-            }
+            if (Mathf.Abs(a.transform.position.x - xPos) < algaeXSpacing)
+                return; // bỏ qua nếu quá gần
         }
-    }
 
+        // spawn tảo ở đáy
+        Vector3 pos = new Vector3(xPos, algaeY, 0);
+        Instantiate(algaePrefab, pos, Quaternion.identity);
+    }
 
 
 }

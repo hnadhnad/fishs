@@ -29,7 +29,7 @@ public class FishSpawner : MonoBehaviour
     public int maxAlgaeCount = 7;
     public float algaeY = 0f;       // vị trí Y (đáy)
     public float algaeXSpacing = 2f; // khoảng cách tối thiểu giữa các cây tảo
-    public Vector2 algaeXRange = new Vector2(1f, 19f);
+    public Vector2 algaeXRange = new Vector2(-10f, 10f);
     public float algaeSpawnInterval = 2f; // spawn mỗi 5 giây
 
     private float algaeTimer = 0f;

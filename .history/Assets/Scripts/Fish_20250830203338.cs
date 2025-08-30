@@ -108,9 +108,6 @@ public class Fish : MonoBehaviour
         float gained = prey.size * growthMultiplier;
         SetSize(this.size + gained);
 
-        GameManager.Instance.AddScore(prey.scoreValue);
-
-
         Destroy(prey.gameObject);
     }
 }

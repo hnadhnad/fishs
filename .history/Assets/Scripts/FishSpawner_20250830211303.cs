@@ -24,16 +24,13 @@ public class FishSpawner : MonoBehaviour
     private float timer;
 
     //Algae
-    [Header("Algae Settings")]
     public GameObject algaePrefab;
-    public int maxAlgaeCount = 7;
-    public float algaeY = 0f;       // vị trí Y (đáy)
-    public float algaeXSpacing = 2f; // khoảng cách tối thiểu giữa các cây tảo
-    public Vector2 algaeXRange = new Vector2(1f, 19f);
-    public float algaeSpawnInterval = 2f; // spawn mỗi 5 giây
+    public int maxAlgaeCount = 10;
+    public float algaeY = -4f;       // toạ độ Y của đáy
+    public float algaeXSpacing = 1f; // khoảng cách tối thiểu giữa các cây tảo
+    public Vector2 algaeXRange = new Vector2(-10f, 10f);
 
-    private float algaeTimer = 0f;
-
+    private int currentAlgaeCount = 0;
 
 
     void Update()
@@ -44,15 +41,6 @@ public class FishSpawner : MonoBehaviour
             timer = 0f;
             SpawnFish();
         }
-
-            // spawn tảo riêng
-        algaeTimer += Time.deltaTime;
-        if (algaeTimer >= algaeSpawnInterval)
-        {
-            algaeTimer = 0f;
-            TrySpawnAlgae();
-        }
-        
     }
 
     void SpawnFish()
@@ -130,35 +118,21 @@ public class FishSpawner : MonoBehaviour
     }
     void TrySpawnAlgae()
     {
-        // kiểm tra giới hạn số lượng
+        if (currentAlgaeCount >= maxAlgaeCount) return;
+
+        float xPos = Random.Range(algaeXRange.x, algaeXRange.y);
+
+        // kiểm tra khoảng cách với tảo khác
         Algae[] allAlgae = FindObjectsOfType<Algae>();
-        if (allAlgae.Length >= maxAlgaeCount) return;
-
-        const int maxAttempts = 10;
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        foreach (Algae a in allAlgae)
         {
-            float xPos = Random.Range(algaeXRange.x, algaeXRange.y);
-
-            bool tooClose = false;
-            foreach (Algae a in allAlgae)
-            {
-                if (Mathf.Abs(a.transform.position.x - xPos) < algaeXSpacing)
-                {
-                    tooClose = true;
-                    break;
-                }
-            }
-
-            if (!tooClose)
-            {
-                // spawn tảo ở vị trí hợp lệ
-                Vector3 pos = new Vector3(xPos, algaeY, 0);
-                Instantiate(algaePrefab, pos, Quaternion.identity);
-                return;
-            }
+            if (Mathf.Abs(a.transform.position.x - xPos) < algaeXSpacing)
+                return; // quá gần, không spawn
         }
+
+        Vector3 pos = new Vector3(xPos, algaeY, 0);
+        Instantiate(algaePrefab, pos, Quaternion.identity);
+        currentAlgaeCount++;
     }
-
-
 
 }
