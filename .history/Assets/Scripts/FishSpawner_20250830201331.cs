@@ -9,9 +9,9 @@ public class FishSpawner : MonoBehaviour
     public float spawnInterval = 2f;
 
     [Header("Spawn Positions")]
-    public float spawnLeftX = -22f;
-    public float spawnRightX = 22f;
-    public float spawnYRange = 12f;
+    public float spawnLeftX = -20f;
+    public float spawnRightX = 20f;
+    public float spawnYRange = 10f;
 
     [Header("Boid Settings")]
     public int boidGroupSize = 5;

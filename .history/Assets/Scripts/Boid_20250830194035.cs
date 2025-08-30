@@ -9,30 +9,13 @@ public class Boid : MonoBehaviour
     public float separationRadius = 1f;
     public float initialSize = 0.8f;
 
-    [Range(0f, 1f)] public float verticalInfluence = 0.3f;
-    public float horizontalBias = 0.5f;
-
     [HideInInspector] public Vector2 velocity;
-    private int initialDir = 1; // +1 = sang phải, -1 = sang trái
 
     void Start()
     {
-        // thay vì random, khởi tạo theo initialDir
-        velocity = new Vector2(initialDir, 0).normalized * speed;
-
+        velocity = Random.insideUnitCircle.normalized * speed;
         Fish f = GetComponent<Fish>();
         if (f != null) f.SetSize(initialSize);
-    }
-
-    public void SetDirection(int dir)
-    {
-        initialDir = (int)Mathf.Sign(dir); // đảm bảo -1 hoặc +1
-        velocity = new Vector2(initialDir, 0) * speed;
-
-        // quay mặt cá theo hướng
-        transform.localScale = new Vector3(initialDir * Mathf.Abs(transform.localScale.x),
-                                           transform.localScale.y,
-                                           transform.localScale.z);
     }
 
     void Update()
@@ -62,25 +45,12 @@ public class Boid : MonoBehaviour
             cohesion = (cohesion - (Vector2)transform.position);
         }
 
-        alignment.y *= verticalInfluence;
-        cohesion.y *= verticalInfluence;
-        separation.y *= verticalInfluence;
-
-        Vector2 keepHorizontal = new Vector2(Mathf.Sign(velocity.x), 0) * horizontalBias;
-
-        Vector2 acceleration = alignment + cohesion + separation + keepHorizontal;
+        Vector2 acceleration = alignment + cohesion + separation;
         velocity += acceleration * Time.deltaTime;
         velocity = velocity.normalized * speed;
 
-        float maxAngle = 30f;
-        float angle = Vector2.Angle(Vector2.right * Mathf.Sign(velocity.x), velocity);
-        if (angle > maxAngle)
-        {
-            velocity = Vector2.Lerp(velocity, new Vector2(Mathf.Sign(velocity.x), 0), 0.5f).normalized * speed;
-        }
-
         transform.position += (Vector3)(velocity * Time.deltaTime);
-        transform.up = velocity;
+        transform.up = velocity; // xoay cá theo hướng bơi
     }
 
     List<Boid> GetNeighbors()

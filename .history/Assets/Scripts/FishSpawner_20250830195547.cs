@@ -8,10 +8,9 @@ public class FishSpawner : MonoBehaviour
 
     public float spawnInterval = 2f;
 
-    [Header("Spawn Positions")]
-    public float spawnLeftX = -22f;
-    public float spawnRightX = 22f;
-    public float spawnYRange = 12f;
+    [Header("Spawn Ranges")]
+    public Vector2 spawnXRange = new Vector2(-19f, 19f); // biên trái & phải
+    public float spawnYRange = 10f;
 
     [Header("Boid Settings")]
     public int boidGroupSize = 5;
@@ -36,15 +35,12 @@ public class FishSpawner : MonoBehaviour
     void SpawnFish()
     {
         int rand = Random.Range(0, 3);
-
-        // random spawn side
-        bool spawnLeft = Random.value < 0.5f;
-        float xPos = spawnLeft ? spawnLeftX : spawnRightX;
+        float xPos = Random.Range(spawnXRange.x, spawnXRange.y);
         float yPos = Random.Range(-spawnYRange, spawnYRange);
         Vector3 spawnPos = new Vector3(xPos, yPos, 0);
 
-        // hướng di chuyển
-        int dir = spawnLeft ? 1 : -1;
+        // Xác định hướng bơi dựa vào spawn bên trái hay phải
+        int dir = (xPos < 0) ? 1 : -1;
 
         if (rand == 0)
         {
@@ -64,34 +60,30 @@ public class FishSpawner : MonoBehaviour
             {
                 Vector3 offset = new Vector3(i * 0.3f * dir, Random.Range(-0.5f, 0.5f), 0);
                 var go = Instantiate(boidPrefab, spawnPos + offset, Quaternion.identity);
+                SetupDirection(go, dir);
                 AssignRandomSize(go, smallSizeRange);
-
-                // ép hướng ban đầu cho cả đàn
-                Boid boid = go.GetComponent<Boid>();
-                if (boid != null) boid.SetDirection(dir);
             }
         }
-
     }
 
     void SetupDirection(GameObject go, int dir)
     {
-        // FishStraight
+        // Nếu có FishStraight thì chỉnh hướng
         FishStraight straight = go.GetComponent<FishStraight>();
         if (straight != null)
             straight.direction = Vector2.right * dir;
 
-        // FishWave
+        // Nếu có FishWave thì đảo speed
         FishWave wave = go.GetComponent<FishWave>();
         if (wave != null)
             wave.speed *= dir;
 
-        // Boid
+        // Nếu là Boid thì chỉnh velocity ban đầu
         Boid boid = go.GetComponent<Boid>();
         if (boid != null)
             boid.velocity = new Vector2(dir, 0) * boid.speed;
 
-        // Quay mặt
+        // Quay mặt cá cho đúng
         go.transform.localScale = new Vector3(dir * Mathf.Abs(go.transform.localScale.x),
                                               go.transform.localScale.y,
                                               go.transform.localScale.z);

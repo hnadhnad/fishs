@@ -9,30 +9,20 @@ public class Boid : MonoBehaviour
     public float separationRadius = 1f;
     public float initialSize = 0.8f;
 
-    [Range(0f, 1f)] public float verticalInfluence = 0.3f;
-    public float horizontalBias = 0.5f;
+    [Range(0f, 1f)] public float verticalInfluence = 0.3f; // <--- ảnh hưởng theo trục Y (0 = chỉ ngang, 1 = full 2D)
+    public float horizontalBias = 0.5f; // <--- lực ưu tiên đi ngang
 
     [HideInInspector] public Vector2 velocity;
-    private int initialDir = 1; // +1 = sang phải, -1 = sang trái
 
     void Start()
     {
-        // thay vì random, khởi tạo theo initialDir
-        velocity = new Vector2(initialDir, 0).normalized * speed;
+        velocity = Random.insideUnitCircle.normalized * speed;
+
+        // ép hướng ban đầu thiên về ngang
+        velocity.y *= verticalInfluence;  
 
         Fish f = GetComponent<Fish>();
         if (f != null) f.SetSize(initialSize);
-    }
-
-    public void SetDirection(int dir)
-    {
-        initialDir = (int)Mathf.Sign(dir); // đảm bảo -1 hoặc +1
-        velocity = new Vector2(initialDir, 0) * speed;
-
-        // quay mặt cá theo hướng
-        transform.localScale = new Vector3(initialDir * Mathf.Abs(transform.localScale.x),
-                                           transform.localScale.y,
-                                           transform.localScale.z);
     }
 
     void Update()
@@ -62,25 +52,31 @@ public class Boid : MonoBehaviour
             cohesion = (cohesion - (Vector2)transform.position);
         }
 
+        // Áp giảm ảnh hưởng theo trục Y
         alignment.y *= verticalInfluence;
         cohesion.y *= verticalInfluence;
         separation.y *= verticalInfluence;
 
+        // Lực kéo ngang (đảm bảo đàn đi theo X)
         Vector2 keepHorizontal = new Vector2(Mathf.Sign(velocity.x), 0) * horizontalBias;
 
         Vector2 acceleration = alignment + cohesion + separation + keepHorizontal;
         velocity += acceleration * Time.deltaTime;
+
+        // Chuẩn hóa và scale theo speed
         velocity = velocity.normalized * speed;
 
-        float maxAngle = 30f;
+        // Giới hạn góc bơi: tránh dốc quá (vd > 30 độ so với trục X)
+        float maxAngle = 30f; 
         float angle = Vector2.Angle(Vector2.right * Mathf.Sign(velocity.x), velocity);
         if (angle > maxAngle)
         {
+            // ép lại theo hướng ngang
             velocity = Vector2.Lerp(velocity, new Vector2(Mathf.Sign(velocity.x), 0), 0.5f).normalized * speed;
         }
 
         transform.position += (Vector3)(velocity * Time.deltaTime);
-        transform.up = velocity;
+        transform.up = velocity; // xoay cá theo hướng bơi
     }
 
     List<Boid> GetNeighbors()

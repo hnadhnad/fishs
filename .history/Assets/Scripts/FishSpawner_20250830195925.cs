@@ -9,9 +9,9 @@ public class FishSpawner : MonoBehaviour
     public float spawnInterval = 2f;
 
     [Header("Spawn Positions")]
-    public float spawnLeftX = -22f;
-    public float spawnRightX = 22f;
-    public float spawnYRange = 12f;
+    public float spawnLeftX = -20f;
+    public float spawnRightX = 20f;
+    public float spawnYRange = 10f;
 
     [Header("Boid Settings")]
     public int boidGroupSize = 5;
@@ -64,14 +64,10 @@ public class FishSpawner : MonoBehaviour
             {
                 Vector3 offset = new Vector3(i * 0.3f * dir, Random.Range(-0.5f, 0.5f), 0);
                 var go = Instantiate(boidPrefab, spawnPos + offset, Quaternion.identity);
+                SetupDirection(go, dir);
                 AssignRandomSize(go, smallSizeRange);
-
-                // ép hướng ban đầu cho cả đàn
-                Boid boid = go.GetComponent<Boid>();
-                if (boid != null) boid.SetDirection(dir);
             }
         }
-
     }
 
     void SetupDirection(GameObject go, int dir)
