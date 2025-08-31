@@ -101,10 +101,4 @@ public class Fish : MonoBehaviour
 
         Destroy(prey.gameObject);
     }
-    public void SetSize(float newSize)
-    {
-        size = newSize;
-        ApplyScale();
-    }
-
 }

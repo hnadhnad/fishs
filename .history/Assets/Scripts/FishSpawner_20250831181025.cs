@@ -73,15 +73,6 @@ public class FishSpawner : MonoBehaviour
             mediumFishTimer = 0f;
             SpawnMediumFish();
         }
-
-        // spawn BigFish
-        bigFishTimer += Time.deltaTime;
-        if (bigFishTimer >= bigFishSpawnInterval)
-        {
-            bigFishTimer = 0f;
-            SpawnBigFish();
-        }
-
     }
 
     void SpawnFish()

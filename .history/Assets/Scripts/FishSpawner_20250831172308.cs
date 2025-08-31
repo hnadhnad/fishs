@@ -17,12 +17,6 @@ public class FishSpawner : MonoBehaviour
     public float spawnRightX = 22f;
     public float spawnYRange = 12f;
 
-    [Header("Spawn Chances (tổng nên = 1.0 hoặc 100%)")]
-    [Range(0f, 1f)] public float straightChance = 0.4f;
-    [Range(0f, 1f)] public float waveChance = 0.4f;
-    [Range(0f, 1f)] public float boidChance = 0.2f;
-
-
     [Header("Boid Settings")]
     public int boidGroupSize = 5;
 
@@ -36,17 +30,6 @@ public class FishSpawner : MonoBehaviour
 
     private float timer = 0f;
     private float algaeTimer = 0f;
-
-    [Header("Medium Fish Settings")]
-    public GameObject mediumFishPrefab;
-    public float mediumFishSpawnInterval = 8f;  // spawn mỗi X giây
-    private float mediumFishTimer = 0f;
-
-    [Header("Big Fish Settings")]
-    public GameObject bigFishPrefab;
-    public float bigFishSpawnInterval = 10f; // khoảng cách thời gian spawn
-    private float bigFishTimer = 0f;
-
 
     void Update()
     {
@@ -65,43 +48,27 @@ public class FishSpawner : MonoBehaviour
             algaeTimer = 0f;
             TrySpawnAlgae();
         }
-
-        // spawn MediumFish riêng
-        mediumFishTimer += Time.deltaTime;
-        if (mediumFishTimer >= mediumFishSpawnInterval)
-        {
-            mediumFishTimer = 0f;
-            SpawnMediumFish();
-        }
-
-        // spawn BigFish
-        bigFishTimer += Time.deltaTime;
-        if (bigFishTimer >= bigFishSpawnInterval)
-        {
-            bigFishTimer = 0f;
-            SpawnBigFish();
-        }
-
     }
 
     void SpawnFish()
     {
+        int rand = Random.Range(0, 3);
+
         // random spawn side
         bool spawnLeft = Random.value < 0.5f;
         float xPos = spawnLeft ? spawnLeftX : spawnRightX;
         float yPos = Random.Range(-spawnYRange, spawnYRange);
         Vector3 spawnPos = new Vector3(xPos, yPos, 0);
 
+        // hướng di chuyển
         int dir = spawnLeft ? 1 : -1;
 
-        // chọn cá theo tỉ lệ
-        float r = Random.value;
-        if (r < straightChance)
+        if (rand == 0)
         {
             var go = Instantiate(fishStraightPrefab, spawnPos, Quaternion.identity);
             SetupDirection(go, dir);
         }
-        else if (r < straightChance + waveChance)
+        else if (rand == 1)
         {
             var go = Instantiate(fishWavePrefab, spawnPos, Quaternion.identity);
             SetupDirection(go, dir);
@@ -113,14 +80,15 @@ public class FishSpawner : MonoBehaviour
                 Vector3 offset = new Vector3(i * 0.3f * dir, Random.Range(-0.5f, 0.5f), 0);
                 var go = Instantiate(boidPrefab, spawnPos + offset, Quaternion.identity);
 
+                // ép hướng ban đầu cho cả đàn
                 Boid boid = go.GetComponent<Boid>();
                 if (boid != null) boid.SetDirection(dir);
 
+                // quay mặt theo hướng
                 SetupDirection(go, dir);
             }
         }
     }
-
 
     void SetupDirection(GameObject go, int dir)
     {
@@ -175,47 +143,4 @@ public class FishSpawner : MonoBehaviour
             }
         }
     }
-
-    void SpawnMediumFish()
-    {
-        bool spawnLeft = Random.value < 0.5f;
-        float xPos = spawnLeft ? spawnLeftX : spawnRightX;
-        float yPos = Random.Range(-spawnYRange, spawnYRange);
-        Vector3 spawnPos = new Vector3(xPos, yPos, 0);
-
-        int dir = spawnLeft ? 1 : -1;
-
-        var go = Instantiate(mediumFishPrefab, spawnPos, Quaternion.identity);
-
-        // 👇 THÊM: gán hướng cho MediumFish
-        MediumFish mf = go.GetComponent<MediumFish>();
-        if (mf != null) mf.direction = dir;
-
-        // 👇 THÊM: lật mặt theo hướng
-        go.transform.localScale = new Vector3(dir * Mathf.Abs(go.transform.localScale.x),
-                                            go.transform.localScale.y,
-                                            go.transform.localScale.z);
-    }
-    
-    void SpawnBigFish()
-    {
-        bool spawnLeft = Random.value < 0.5f;
-        float xPos = spawnLeft ? spawnLeftX : spawnRightX;
-        float yPos = Random.Range(-spawnYRange, spawnYRange);
-        Vector3 spawnPos = new Vector3(xPos, yPos, 0);
-
-        int dir = spawnLeft ? 1 : -1;
-
-        var go = Instantiate(bigFishPrefab, spawnPos, Quaternion.identity);
-
-        BigFish bf = go.GetComponent<BigFish>();
-        if (bf != null) bf.direction = dir;
-
-        go.transform.localScale = new Vector3(dir * Mathf.Abs(go.transform.localScale.x),
-                                            go.transform.localScale.y,
-                                            go.transform.localScale.z);
-    }
-
-
-
 }

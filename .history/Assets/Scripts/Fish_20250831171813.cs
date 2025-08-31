@@ -3,15 +3,17 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class Fish : MonoBehaviour
 {
-    [Header("Fish Type")]
+     [Header("Fish Type")]
     public bool isPlayer = false;
 
     [Header("Score")]
     public int scoreValue = 10;
-
-    [Header("Size")]
-    [Tooltip("Kích thước cố định (set trong prefab)")]
+    [Header("Size & Growth")]
     public float size = 1f;
+    public float minSize = 0.4f;
+    public float maxSize = 6f;
+    public float eatThreshold = 1.2f;
+    public float growthMultiplier = 0.6f;
 
     [Header("Feedback")]
     public AudioClip eatSound;
@@ -23,10 +25,10 @@ public class Fish : MonoBehaviour
     [Tooltip("Thời gian ân hạn sau khi spawn (chỉ áp dụng cho Destroy, vẫn bị ăn bình thường)")]
     public float spawnGraceTime = 1.5f;
 
-    private Rigidbody2D rb;
-    private Collider2D col;
-    private MapManager mapManager;
-    private float spawnTime;
+    Rigidbody2D rb;
+    Collider2D col;
+    MapManager mapManager;
+    float spawnTime;
 
     void Awake()
     {
@@ -42,12 +44,12 @@ public class Fish : MonoBehaviour
         if (mapManager == null)
             Debug.LogError("Không tìm thấy MapManager trong scene!");
 
-        spawnTime = Time.time;
+        spawnTime = Time.time; // đánh dấu thời điểm spawn
     }
 
     void Update()
     {
-        // chỉ kiểm tra despawn sau khoảng spawnGraceTime
+        // Chỉ bỏ qua check Destroy trong khoảng spawnGraceTime
         if (Time.time - spawnTime < spawnGraceTime) return;
 
         if (mapManager != null)
@@ -63,6 +65,12 @@ public class Fish : MonoBehaviour
         }
     }
 
+    public void SetSize(float newSize)
+    {
+        size = Mathf.Clamp(newSize, minSize, maxSize);
+        ApplyScale();
+    }
+
     void ApplyScale()
     {
         transform.localScale = Vector3.one * size;
@@ -75,13 +83,19 @@ public class Fish : MonoBehaviour
         Fish otherFish = other.GetComponent<Fish>();
         if (otherFish == null) return;
 
-        // Nếu cùng size thì không ai ăn ai
-        if (Mathf.Approximately(this.size, otherFish.size)) return;
-
-        if (this.size > otherFish.size)
+        if (this.size >= otherFish.size * eatThreshold)
         {
             Eat(otherFish);
+            return;
         }
+
+        if (otherFish.size >= this.size * otherFish.eatThreshold)
+        {
+            return;
+        }
+
+        Vector2 dir = (transform.position - other.transform.position).normalized;
+        if (rb != null) rb.AddForce(dir * 20f);
     }
 
     void Eat(Fish prey)
@@ -94,17 +108,18 @@ public class Fish : MonoBehaviour
         if (eatSound != null)
             AudioSource.PlayClipAtPoint(eatSound, Camera.main.transform.position);
 
-        if (isPlayer && GameManager.Instance != null)
+        if (isPlayer)
         {
+            // Cá người chơi: chỉ cộng điểm, không lớn lên trực tiếp
             GameManager.Instance.AddScore(prey.scoreValue);
+        }
+        else
+        {
+            // Cá thường: ăn được nhưng không lớn nữa
+            // nếu muốn bạn có thể giữ logic Destroy prey thôi
         }
 
         Destroy(prey.gameObject);
-    }
-    public void SetSize(float newSize)
-    {
-        size = newSize;
-        ApplyScale();
     }
 
 }
