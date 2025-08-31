@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     [Header("UI Elements")]
+    public Slider progressBar;   // thanh tiến trình
+    public TMP_Text scoreText;
 
     [Header("Progress Settings")]
     // Mốc điểm cần đạt để lên cấp
@@ -25,6 +26,8 @@ public class GameManager : MonoBehaviour
     public Fish playerFish;
 
     [Header("Progress Settings")]
+    public int[] scoreThresholds = { 30, 50, 150, 300 };   // Mốc điểm
+    public float[] sizePerLevel = { 1.5f, 1.8f, 2f, 2.5f }; // Size tương ứng
 
     [Header("UI Elements")]
     public Slider progressBar;
@@ -58,70 +61,50 @@ public class GameManager : MonoBehaviour
         if (scoreText != null)
             scoreText.text = $"Score: {currentScore}";
 
-        // Xử lý lên cấp trước
+        if (progressBar != null && currentLevel < scoreThresholds.Length)
+        {
+            int nextTarget = scoreThresholds[currentLevel];
+            float prevTarget = (currentLevel == 0) ? 0 : scoreThresholds[currentLevel - 1];
+
+            progressBar.value = Mathf.InverseLerp(prevTarget, nextTarget, currentScore);
+        }
+
         while (currentLevel < scoreThresholds.Length &&
             currentScore >= scoreThresholds[currentLevel])
         {
             LevelUp();
         }
-
-        // Cập nhật thanh tiến trình
-        if (progressBar != null)
-        {
-            float stepSize = 1f / scoreThresholds.Length;
-
-            if (currentLevel >= scoreThresholds.Length)
-            {
-                // Đã đạt mốc cuối cùng
-                progressBar.value = 1f;
-            }
-            else
-            {
-                float prevTarget = (currentLevel == 0) ? 0 : scoreThresholds[currentLevel - 1];
-                float nextTarget = scoreThresholds[currentLevel];
-
-                // % trong mốc hiện tại (0 → 1)
-                float localProgress = Mathf.InverseLerp(prevTarget, nextTarget, currentScore);
-
-                // Tổng tiến trình = số mốc đã qua + phần trăm trong mốc hiện tại
-                progressBar.value = (currentLevel * stepSize) + (localProgress * stepSize);
-            }
-        }
-}
-
-
+    }
 
 
     void LevelUp()
     {
+        // Set size theo mốc hiện tại
         if (currentLevel < sizePerLevel.Length)
         {
             playerFish.SetSize(sizePerLevel[currentLevel]);
             Debug.Log($"Player đạt mốc {scoreThresholds[currentLevel]} => size = {playerFish.size}");
         }
 
-        // Highlight milestone đã đạt
-        if (currentLevel < milestoneMarkers.Count)
-        {
-            milestoneMarkers[currentLevel].GetComponent<Image>().color = Color.green;
-        }
-
         currentLevel++;
-    }
 
+        // Reset progress bar về 0 cho mốc tiếp theo
+        if (progressBar != null)
+            progressBar.value = 0;
+    }
     void SetupMilestones()
     {
         if (milestoneContainer == null || milestonePrefab == null) return;
 
-        int total = scoreThresholds.Length;
+        float maxScore = scoreThresholds[scoreThresholds.Length - 1];
 
-        for (int i = 0; i < total; i++)
+        foreach (int threshold in scoreThresholds)
         {
             GameObject marker = Instantiate(milestonePrefab, milestoneContainer);
-            marker.name = $"Milestone_{scoreThresholds[i]}";
+            marker.name = $"Milestone_{threshold}";
 
-            // Vị trí milestone theo chia đều (i+1)/total
-            float normalized = (i + 1f) / total;
+            // Tỷ lệ điểm trên thanh [0..1]
+            float normalized = threshold / maxScore;
 
             RectTransform rt = marker.GetComponent<RectTransform>();
             rt.anchorMin = new Vector2(normalized, 0f);
@@ -131,6 +114,5 @@ public class GameManager : MonoBehaviour
             milestoneMarkers.Add(marker);
         }
     }
-
 
 }

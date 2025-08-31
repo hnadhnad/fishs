@@ -108,18 +108,12 @@ public class Fish : MonoBehaviour
         if (eatSound != null)
             AudioSource.PlayClipAtPoint(eatSound, Camera.main.transform.position);
 
-        if (isPlayer)
-        {
-            // Cá người chơi: chỉ cộng điểm, không lớn lên trực tiếp
-            GameManager.Instance.AddScore(prey.scoreValue);
-        }
-        else
-        {
-            // Cá thường: ăn được nhưng không lớn nữa
-            // nếu muốn bạn có thể giữ logic Destroy prey thôi
-        }
+        float gained = prey.size * growthMultiplier;
+        SetSize(this.size + gained);
+
+        GameManager.Instance.AddScore(prey.scoreValue);
+
 
         Destroy(prey.gameObject);
     }
-
 }

@@ -58,38 +58,20 @@ public class GameManager : MonoBehaviour
         if (scoreText != null)
             scoreText.text = $"Score: {currentScore}";
 
-        // Xử lý lên cấp trước
+        if (progressBar != null && currentLevel < scoreThresholds.Length)
+        {
+            int nextTarget = scoreThresholds[currentLevel];
+            float prevTarget = (currentLevel == 0) ? 0 : scoreThresholds[currentLevel - 1];
+
+            progressBar.value = Mathf.InverseLerp(prevTarget, nextTarget, currentScore);
+        }
+
         while (currentLevel < scoreThresholds.Length &&
             currentScore >= scoreThresholds[currentLevel])
         {
             LevelUp();
         }
-
-        // Cập nhật thanh tiến trình
-        if (progressBar != null)
-        {
-            float stepSize = 1f / scoreThresholds.Length;
-
-            if (currentLevel >= scoreThresholds.Length)
-            {
-                // Đã đạt mốc cuối cùng
-                progressBar.value = 1f;
-            }
-            else
-            {
-                float prevTarget = (currentLevel == 0) ? 0 : scoreThresholds[currentLevel - 1];
-                float nextTarget = scoreThresholds[currentLevel];
-
-                // % trong mốc hiện tại (0 → 1)
-                float localProgress = Mathf.InverseLerp(prevTarget, nextTarget, currentScore);
-
-                // Tổng tiến trình = số mốc đã qua + phần trăm trong mốc hiện tại
-                progressBar.value = (currentLevel * stepSize) + (localProgress * stepSize);
-            }
-        }
-}
-
-
+    }
 
 
     void LevelUp()
@@ -107,6 +89,7 @@ public class GameManager : MonoBehaviour
         }
 
         currentLevel++;
+        if (progressBar != null) progressBar.value = 0;
     }
 
     void SetupMilestones()
