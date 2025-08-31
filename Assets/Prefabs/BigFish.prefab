@@ -188,4 +188,5 @@ MonoBehaviour:
   chaseRadius: 6
   chargeUpTime: 1
   chargeDuration: 2
+  fleeRadius: 7
   direction: -1

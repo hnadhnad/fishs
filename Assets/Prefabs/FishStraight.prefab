@@ -103,6 +103,7 @@ MonoBehaviour:
   speed: 2
   direction: {x: 1, y: 0}
   initialSize: 0.9
+  fleeRadius: 7
 --- !u!50 &7280750248094888256
 Rigidbody2D:
   serializedVersion: 4
@@ -177,10 +178,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b52ea4a44487c9b469c98d8f82f45226, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayer: 0
+  scoreValue: 10
   size: 0.5
-  minSize: 0.4
-  maxSize: 6
-  eatThreshold: 1.2
-  growthMultiplier: 0.6
   eatSound: {fileID: 0}
   eatVfxPrefab: {fileID: 0}
+  despawnMargin: 1
+  spawnGraceTime: 1.5

@@ -7,6 +7,7 @@ public class FishStraight : MonoBehaviour
     public Vector2 direction = Vector2.right;
     public float initialSize = 0.9f;
 
+    // --- thêm mới ---
     public float fleeRadius = 5f; // bán kính khi gặp player sẽ bỏ chạy
     private Transform player;
     private Fish playerFish;
@@ -44,7 +45,7 @@ public class FishStraight : MonoBehaviour
             {
                 Vector2 fleeDir = ((Vector2)transform.position - (Vector2)player.position).normalized;
                 transform.Translate(fleeDir * speed * 1.5f * Time.deltaTime); // chạy nhanh hơn bình thường
-                // KHÔNG cập nhật direction nữa để tránh dí theo player
+                direction = fleeDir; // cập nhật hướng để tiếp tục chạy xa hơn
                 if (!IsVisible()) Destroy(gameObject);
                 return; // bỏ qua code di chuyển bình thường
             }

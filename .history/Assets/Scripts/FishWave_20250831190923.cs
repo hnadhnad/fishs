@@ -9,7 +9,7 @@ public class FishWave : MonoBehaviour
     public float frequency = 2f;
     public float fleeRadius = 5f;
 
-    [HideInInspector] public int direction = 1; // +1 = sang phải, -1 = sang trái
+    [HideInInspector] public int direction = 1;
 
     private Vector3 startPos;
     private float waveOffset;
@@ -34,23 +34,23 @@ public class FishWave : MonoBehaviour
 
     void Update()
     {
-        if (player != null && playerFish != null && selfFish != null)
+        if (player != null && playerFish != null)
         {
             float distance = Vector2.Distance(transform.position, player.position);
 
-            // Nếu player to hơn trong bán kính -> bỏ chạy
+            // Player to hơn -> bỏ chạy
             if (distance <= fleeRadius && playerFish.size > selfFish.size)
             {
                 Vector3 fleeDir = (transform.position - player.position).normalized;
-                transform.position += fleeDir * speed * 1.5f * Time.deltaTime;
+                transform.position += fleeDir * speed * Time.deltaTime;
 
                 if (!IsVisible())
                     Destroy(gameObject);
-                return; // bỏ qua bơi sóng khi đang chạy
+                return;
             }
         }
 
-        // Nếu player nhỏ hơn hoặc xa -> bơi sóng như cũ
+        // Nếu không bỏ chạy thì bơi sóng như cũ
         SwimWave();
 
         if (!IsVisible())
@@ -66,7 +66,6 @@ public class FishWave : MonoBehaviour
 
     bool IsVisible()
     {
-        if (Camera.main == null) return true;
         Vector3 viewPos = Camera.main.WorldToViewportPoint(transform.position);
         return (viewPos.x > -0.1f && viewPos.x < 1.1f && viewPos.y > -0.1f && viewPos.y < 1.1f);
     }

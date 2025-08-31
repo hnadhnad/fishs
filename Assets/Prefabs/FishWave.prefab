@@ -103,7 +103,8 @@ MonoBehaviour:
   speed: 2
   amplitude: 0.5
   frequency: 2
-  initialSize: 0.8
+  fleeRadius: 7
+  direction: 1
 --- !u!50 &4448533899920854603
 Rigidbody2D:
   serializedVersion: 4
