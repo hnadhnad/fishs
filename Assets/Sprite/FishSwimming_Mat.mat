@@ -53,11 +53,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Amplitude: 0.006
+    - _Amplitude: 0.1
     - _EnableExternalAlpha: 0
     - _Frequency: 5
-    - _Offset: 0.612
-    - _Speed: 3
+    - _Offset: 0.162
+    - _Speed: -6
     - _TailPower: 4
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
