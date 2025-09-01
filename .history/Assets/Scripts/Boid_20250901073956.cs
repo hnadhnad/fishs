@@ -4,13 +4,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Fish))]
 public class Boid : MonoBehaviour
 {
-    [Header("Movement")]
-    public float minSpeed = 1.5f;
-    public float maxSpeed = 3.0f;
-
-    private float baseSpeed;   // tốc độ cơ bản (random mỗi con)
-    public float speed;       // tốc độ hiện tại (có dao động)
-
+    public float speed = 2f;
     public float neighborRadius = 2f;
     public float separationRadius = 1f;
     public float initialSize = 0.8f;
@@ -18,18 +12,14 @@ public class Boid : MonoBehaviour
     [Range(0f, 1f)] public float verticalInfluence = 0.3f;
     public float horizontalBias = 0.5f;
 
-    [Header("Speed Oscillation")]
-    public float speedOscillationAmplitude = 0.3f;  // biên độ dao động
-    public float speedOscillationFrequency = 1.5f;  // tần số dao động
-
     [Header("Visual Settings")]
-    public float maxTiltAngle = 25f;
-    public float tiltLerpSpeed = 5f;
+    public float maxTiltAngle = 25f; // góc nghiêng tối đa khi bơi
+    public float tiltLerpSpeed = 5f; // tốc độ xoay mượt
 
     [HideInInspector] public Vector2 velocity;
-    private int initialDir = 1;
+    private int initialDir = 1; // +1 = sang phải, -1 = sang trái
 
-    [Header("Flee Settings")]
+    // --- thêm mới ---
     public float fleeRadius = 5f;
     private Transform player;
     private Fish playerFish;
@@ -39,12 +29,6 @@ public class Boid : MonoBehaviour
 
     void Start()
     {
-        // random tốc độ cơ bản cho cá này
-        baseSpeed = Random.Range(minSpeed, maxSpeed);
-
-        // khởi tạo speed
-        speed = baseSpeed;
-
         velocity = new Vector2(initialDir, 0).normalized * speed;
 
         selfFish = GetComponent<Fish>();
@@ -63,18 +47,14 @@ public class Boid : MonoBehaviour
 
     public void SetDirection(int dir)
     {
-        initialDir = (int)Mathf.Sign(dir);
+        initialDir = (int)Mathf.Sign(dir); // đảm bảo -1 hoặc +1
         velocity = new Vector2(initialDir, 0) * speed;
+
         UpdateVisual(velocity);
     }
 
     void Update()
     {
-        // --- dao động tốc độ ---
-        float osc = Mathf.Sin(Time.time * speedOscillationFrequency + GetInstanceID() * 0.1f);
-        float oscillation = osc * speedOscillationAmplitude;
-        speed = Mathf.Clamp(baseSpeed + oscillation, minSpeed, maxSpeed);
-
         // --- logic bỏ chạy ---
         if (player != null && playerFish != null && selfFish != null)
         {
@@ -82,15 +62,16 @@ public class Boid : MonoBehaviour
             if (distance <= fleeRadius && playerFish.size > selfFish.size)
             {
                 Vector2 fleeDir = ((Vector2)transform.position - (Vector2)player.position).normalized;
-                velocity = fleeDir * speed * 1.5f;
+                velocity = fleeDir * speed * 1.5f; // chạy nhanh hơn
                 transform.position += (Vector3)(velocity * Time.deltaTime);
 
+                // cập nhật flip + tilt
                 UpdateVisual(velocity);
-                return;
+                return; // bỏ qua logic boid thường
             }
         }
 
-        // --- logic boid ---
+        // --- logic boid bình thường ---
         List<Boid> neighbors = GetNeighbors();
 
         Vector2 alignment = Vector2.zero;
@@ -123,15 +104,9 @@ public class Boid : MonoBehaviour
         Vector2 keepHorizontal = new Vector2(Mathf.Sign(velocity.x), 0) * horizontalBias;
 
         Vector2 acceleration = alignment + cohesion + separation + keepHorizontal;
+        velocity += acceleration * Time.deltaTime;
+        velocity = velocity.normalized * speed;
 
-        // hướng velocity mong muốn
-        Vector2 desiredVelocity = (velocity + acceleration).normalized * speed;
-
-        // áp dụng quán tính (inertia)
-        float inertia = 5f; // chỉnh nhỏ hơn thì cá phản ứng nhanh hơn, lớn hơn thì mượt hơn
-        velocity = Vector2.Lerp(velocity, desiredVelocity, inertia * Time.deltaTime);
-
-        // giới hạn góc bơi
         float maxAngle = 30f;
         float angle = Vector2.Angle(Vector2.right * Mathf.Sign(velocity.x), velocity);
         if (angle > maxAngle)
@@ -141,7 +116,7 @@ public class Boid : MonoBehaviour
 
         transform.position += (Vector3)(velocity * Time.deltaTime);
 
-
+        // cập nhật flip + tilt theo hướng velocity
         UpdateVisual(velocity);
     }
 
@@ -151,10 +126,12 @@ public class Boid : MonoBehaviour
 
         float signX = Mathf.Sign(moveDir.x);
 
+        // flip sprite
         transform.localScale = new Vector3(signX * baseScaleX,
                                            transform.localScale.y,
                                            transform.localScale.z);
 
+        // tilt theo hướng y
         float tiltAngle = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
         tiltAngle *= signX;
 

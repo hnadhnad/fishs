@@ -20,8 +20,6 @@ public class MediumFish : MonoBehaviour
     private Fish selfFish;
     private Fish playerFish;
 
-    private float baseScaleX; // scale gốc để flip
-
     void Start()
     {
         selfFish = GetComponent<Fish>();
@@ -33,8 +31,6 @@ public class MediumFish : MonoBehaviour
         }
 
         waveOffset = Random.value * Mathf.PI * 2f;
-
-        baseScaleX = Mathf.Abs(transform.localScale.x); // scale X gốc
     }
 
     void Update()
@@ -59,37 +55,29 @@ public class MediumFish : MonoBehaviour
         else
         {
             float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
-            moveDir = new Vector3(direction, waveY, 0f);
+            moveDir = new Vector3(direction, waveY, 0f); // không normalize để không làm mất hướng x
             moveDir.Normalize();
         }
 
         // di chuyển
         transform.position += moveDir * speed * Time.deltaTime;
 
-        // cập nhật flip và tilt
-        UpdateVisual(moveDir);
+        // quay mặt và nghiêng theo hướng di chuyển
+        UpdateRotation(moveDir);
     }
 
-    void UpdateVisual(Vector3 moveDir)
+    void UpdateRotation(Vector3 moveDir)
     {
         if (Mathf.Abs(moveDir.x) < 0.001f) return;
 
-        // xác định hướng cá theo trục X
+        // flip mặt theo trục X
         float signX = Mathf.Sign(moveDir.x);
+        transform.localScale = new Vector3(signX * Mathf.Abs(transform.localScale.x),
+                                           transform.localScale.y,
+                                           transform.localScale.z);
 
-        // flip scale theo hướng đi
-        transform.localScale = new Vector3(signX * baseScaleX,
-                                        transform.localScale.y,
-                                        transform.localScale.z);
-
-        // tilt theo Y, có bù hướng đi (signX)
+        // nghiêng lên/xuống theo hướng Y
         float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
-
-        // nếu cá đang đi sang trái thì đảo tilt để tránh bị gương ngược
-        tilt *= signX;
-
-        // gán nghiêng
-        transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
+        transform.rotation = Quaternion.Euler(0f, 0f, tilt);
     }
-
 }

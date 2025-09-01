@@ -9,7 +9,7 @@ public class Boid : MonoBehaviour
     public float maxSpeed = 3.0f;
 
     private float baseSpeed;   // tốc độ cơ bản (random mỗi con)
-    public float speed;       // tốc độ hiện tại (có dao động)
+    private float speed;       // tốc độ hiện tại (có dao động)
 
     public float neighborRadius = 2f;
     public float separationRadius = 1f;
@@ -123,13 +123,10 @@ public class Boid : MonoBehaviour
         Vector2 keepHorizontal = new Vector2(Mathf.Sign(velocity.x), 0) * horizontalBias;
 
         Vector2 acceleration = alignment + cohesion + separation + keepHorizontal;
+        velocity += acceleration * Time.deltaTime;
 
-        // hướng velocity mong muốn
-        Vector2 desiredVelocity = (velocity + acceleration).normalized * speed;
-
-        // áp dụng quán tính (inertia)
-        float inertia = 5f; // chỉnh nhỏ hơn thì cá phản ứng nhanh hơn, lớn hơn thì mượt hơn
-        velocity = Vector2.Lerp(velocity, desiredVelocity, inertia * Time.deltaTime);
+        // chuẩn hóa theo speed đã dao động
+        velocity = velocity.normalized * speed;
 
         // giới hạn góc bơi
         float maxAngle = 30f;
@@ -140,7 +137,6 @@ public class Boid : MonoBehaviour
         }
 
         transform.position += (Vector3)(velocity * Time.deltaTime);
-
 
         UpdateVisual(velocity);
     }

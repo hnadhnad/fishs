@@ -8,19 +8,14 @@ public class MediumFish : MonoBehaviour
     public float waveAmplitude = 1f;
     public float waveFrequency = 2f;
     public float chaseRadius = 5f;
-    public float fleeRadius = 5f;
-
-    [Header("Rotation Settings")]
-    public float maxTiltAngle = 15f; // góc nghiêng tối đa
+    public float fleeRadius = 5f;   // bán kính bỏ chạy
 
     [HideInInspector] public int direction = -1;
 
     private Transform player;
     private float waveOffset;
-    private Fish selfFish;
-    private Fish playerFish;
-
-    private float baseScaleX; // scale gốc để flip
+    private Fish selfFish;    // cá hiện tại
+    private Fish playerFish;  // cá người chơi
 
     void Start()
     {
@@ -34,7 +29,8 @@ public class MediumFish : MonoBehaviour
 
         waveOffset = Random.value * Mathf.PI * 2f;
 
-        baseScaleX = Mathf.Abs(transform.localScale.x); // scale X gốc
+        // quay sprite ban đầu theo direction
+        FlipSprite(direction);
     }
 
     void Update()
@@ -55,41 +51,34 @@ public class MediumFish : MonoBehaviour
         {
             moveDir = (player.position - transform.position).normalized;
         }
-        // --- Không có player trong phạm vi -> bơi sóng ---
+        // --- Không có player trong phạm vi -> wave ---
         else
         {
             float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
-            moveDir = new Vector3(direction, waveY, 0f);
-            moveDir.Normalize();
+            moveDir = new Vector3(direction, waveY, 0f).normalized;
         }
 
-        // di chuyển
         transform.position += moveDir * speed * Time.deltaTime;
 
-        // cập nhật flip và tilt
-        UpdateVisual(moveDir);
+        // quay mặt theo hướng x
+        FlipSprite(moveDir.x);
     }
 
-    void UpdateVisual(Vector3 moveDir)
+    void FlipSprite(float dirX)
     {
-        if (Mathf.Abs(moveDir.x) < 0.001f) return;
+        if (Mathf.Abs(dirX) < 0.001f) return; // tránh lỗi khi chỉ di chuyển lên xuống
 
-        // xác định hướng cá theo trục X
-        float signX = Mathf.Sign(moveDir.x);
-
-        // flip scale theo hướng đi
-        transform.localScale = new Vector3(signX * baseScaleX,
-                                        transform.localScale.y,
-                                        transform.localScale.z);
-
-        // tilt theo Y, có bù hướng đi (signX)
-        float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
-
-        // nếu cá đang đi sang trái thì đảo tilt để tránh bị gương ngược
-        tilt *= signX;
-
-        // gán nghiêng
-        transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
+        if (dirX > 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x),
+                                               transform.localScale.y,
+                                               transform.localScale.z);
+        }
+        else if (dirX < 0)
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x),
+                                               transform.localScale.y,
+                                               transform.localScale.z);
+        }
     }
-
 }

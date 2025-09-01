@@ -117,7 +117,7 @@ public class FishMovement : MonoBehaviour
 
         // --- chỉnh xoay đầu --- 
         float yRatio = moveDir.y / moveDir.magnitude; // tỷ lệ hướng y
-        float tiltThreshold = 0.3f; // ngưỡng để bắt đầu nghiêng (0.25 = phải chếch lên ít nhất ~15°)
+        float tiltThreshold = 0.25f; // ngưỡng để bắt đầu nghiêng (0.25 = phải chếch lên ít nhất ~15°)
 
         float targetTilt = 0f;
         if (Mathf.Abs(yRatio) > tiltThreshold)

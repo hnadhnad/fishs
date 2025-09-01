@@ -74,22 +74,16 @@ public class MediumFish : MonoBehaviour
     {
         if (Mathf.Abs(moveDir.x) < 0.001f) return;
 
-        // xác định hướng cá theo trục X
+        // flip theo hướng X
         float signX = Mathf.Sign(moveDir.x);
-
-        // flip scale theo hướng đi
         transform.localScale = new Vector3(signX * baseScaleX,
-                                        transform.localScale.y,
-                                        transform.localScale.z);
+                                           transform.localScale.y,
+                                           transform.localScale.z);
 
-        // tilt theo Y, có bù hướng đi (signX)
+        // tính tilt theo hướng Y (không bị ngược khi flip)
         float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
 
-        // nếu cá đang đi sang trái thì đảo tilt để tránh bị gương ngược
-        tilt *= signX;
-
-        // gán nghiêng
+        // áp tilt lên localRotation
         transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
     }
-
 }

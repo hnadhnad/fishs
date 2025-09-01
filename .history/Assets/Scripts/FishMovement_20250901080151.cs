@@ -98,13 +98,14 @@ public class FishMovement : MonoBehaviour
 
         if (moveDir.magnitude < 0.01f)
         {
-            // đứng yên → xoay về 0
+            // đứng yên → xoay thẳng đứng
             Quaternion targetRot = Quaternion.Euler(0f, 0f, 0f);
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRot, tiltLerpSpeed * Time.deltaTime);
 
+            // scale đồng đều
             transform.localScale = new Vector3(baseScaleX * currentSize,
-                                            currentSize,
-                                            currentSize);
+                                               currentSize,
+                                               currentSize);
             return;
         }
 
@@ -112,26 +113,14 @@ public class FishMovement : MonoBehaviour
 
         // flip + scale đồng đều
         transform.localScale = new Vector3(signX * baseScaleX * currentSize,
-                                        currentSize,
-                                        currentSize);
+                                           currentSize,
+                                           currentSize);
 
-        // --- chỉnh xoay đầu --- 
-        float yRatio = moveDir.y / moveDir.magnitude; // tỷ lệ hướng y
-        float tiltThreshold = 0.3f; // ngưỡng để bắt đầu nghiêng (0.25 = phải chếch lên ít nhất ~15°)
+        // tilt theo hướng y
+        float tiltAngle = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
+        tiltAngle *= signX;
 
-        float targetTilt = 0f;
-        if (Mathf.Abs(yRatio) > tiltThreshold)
-        {
-            // tính góc nghiêng mượt theo độ mạnh của hướng Y
-            float normalizedY = (Mathf.Abs(yRatio) - tiltThreshold) / (1f - tiltThreshold);
-            targetTilt = Mathf.Clamp(normalizedY * maxTiltAngle * Mathf.Sign(moveDir.y), -maxTiltAngle, maxTiltAngle);
-        }
-
-        targetTilt *= signX; // đảo theo hướng đi ngang
-
-        // xoay dần thay vì nhảy ngay
-        Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetTilt);
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, tiltAngle);
         transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, tiltLerpSpeed * Time.deltaTime);
     }
-
 }

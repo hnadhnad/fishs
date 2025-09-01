@@ -8,19 +8,17 @@ public class MediumFish : MonoBehaviour
     public float waveAmplitude = 1f;
     public float waveFrequency = 2f;
     public float chaseRadius = 5f;
-    public float fleeRadius = 5f;
+    public float fleeRadius = 5f;   // bán kính bỏ chạy
 
-    [Header("Rotation Settings")]
-    public float maxTiltAngle = 15f; // góc nghiêng tối đa
+    [Header("Visual Settings")]
+    public float maxTiltAngle = 20f; // góc nghiêng tối đa khi bơi lên/xuống
 
     [HideInInspector] public int direction = -1;
 
     private Transform player;
     private float waveOffset;
-    private Fish selfFish;
-    private Fish playerFish;
-
-    private float baseScaleX; // scale gốc để flip
+    private Fish selfFish;    // cá hiện tại
+    private Fish playerFish;  // cá người chơi
 
     void Start()
     {
@@ -34,7 +32,9 @@ public class MediumFish : MonoBehaviour
 
         waveOffset = Random.value * Mathf.PI * 2f;
 
-        baseScaleX = Mathf.Abs(transform.localScale.x); // scale X gốc
+        // quay sprite ban đầu theo direction
+        UpdateRotation(new Vector3(direction, 0, 0));
+
     }
 
     void Update()
@@ -55,41 +55,41 @@ public class MediumFish : MonoBehaviour
         {
             moveDir = (player.position - transform.position).normalized;
         }
-        // --- Không có player trong phạm vi -> bơi sóng ---
+        // --- Không có player trong phạm vi -> wave ---
         else
         {
             float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
-            moveDir = new Vector3(direction, waveY, 0f);
-            moveDir.Normalize();
+            moveDir = new Vector3(direction, waveY, 0f).normalized;
         }
 
-        // di chuyển
         transform.position += moveDir * speed * Time.deltaTime;
 
-        // cập nhật flip và tilt
-        UpdateVisual(moveDir);
+        // quay mặt theo hướng và nghiêng theo hướng bơi
+        UpdateRotation(moveDir);
     }
 
-    void UpdateVisual(Vector3 moveDir)
+    void UpdateRotation(Vector3 moveDir)
     {
-        if (Mathf.Abs(moveDir.x) < 0.001f) return;
+        if (Mathf.Abs(moveDir.x) < 0.001f) return; // tránh lỗi khi chỉ bơi lên/xuống
 
-        // xác định hướng cá theo trục X
-        float signX = Mathf.Sign(moveDir.x);
+        // Lật mặt theo trục X
+        if (moveDir.x > 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x),
+                                               transform.localScale.y,
+                                               transform.localScale.z);
+        }
+        else if (moveDir.x < 0)
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x),
+                                               transform.localScale.y,
+                                               transform.localScale.z);
+        }
 
-        // flip scale theo hướng đi
-        transform.localScale = new Vector3(signX * baseScaleX,
-                                        transform.localScale.y,
-                                        transform.localScale.z);
-
-        // tilt theo Y, có bù hướng đi (signX)
+        // Góc nghiêng dựa theo hướng lên/xuống
         float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
 
-        // nếu cá đang đi sang trái thì đảo tilt để tránh bị gương ngược
-        tilt *= signX;
-
-        // gán nghiêng
-        transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
+        // áp dụng xoay quanh trục Z
+        transform.rotation = Quaternion.Euler(0, 0, tilt);
     }
-
 }

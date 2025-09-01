@@ -17,9 +17,6 @@ public class BigFish : MonoBehaviour
     [Header("Flee Settings")]
     public float fleeRadius = 6f;       // bán kính bỏ chạy
 
-    [Header("Visual Settings")]
-    public float maxTiltAngle = 20f;    // góc nghiêng tối đa
-
     [HideInInspector] public int direction = -1; // 1 = qua phải, -1 = qua trái
 
     private Transform player;
@@ -31,8 +28,6 @@ public class BigFish : MonoBehaviour
     private float chargeTimer = 0f;
     private Vector3 chargeDir;
 
-    private float baseScaleX;
-
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -40,8 +35,6 @@ public class BigFish : MonoBehaviour
 
         selfFish = GetComponent<Fish>();
         waveOffset = Random.value * Mathf.PI * 2f;
-
-        baseScaleX = Mathf.Abs(transform.localScale.x);
     }
 
     void Update()
@@ -55,8 +48,6 @@ public class BigFish : MonoBehaviour
         {
             Vector3 fleeDir = (transform.position - player.position).normalized;
             transform.position += fleeDir * normalSpeed * Time.deltaTime;
-
-            UpdateVisual(fleeDir);
             return; // khi đang chạy thì không làm gì khác
         }
 
@@ -81,8 +72,6 @@ public class BigFish : MonoBehaviour
                 // đang lao nhanh
                 transform.position += chargeDir * chargeSpeed * Time.deltaTime;
                 chargeTimer += Time.deltaTime;
-
-                UpdateVisual(chargeDir);
             }
             else
             {
@@ -96,26 +85,6 @@ public class BigFish : MonoBehaviour
             float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
             Vector3 moveDir = new Vector3(direction, waveY, 0f).normalized;
             transform.position += moveDir * normalSpeed * Time.deltaTime;
-
-            UpdateVisual(moveDir);
         }
-    }
-
-    void UpdateVisual(Vector3 moveDir)
-    {
-        if (Mathf.Abs(moveDir.x) < 0.001f) return;
-
-        float signX = Mathf.Sign(moveDir.x);
-
-        // flip sprite theo hướng x
-        transform.localScale = new Vector3(signX * baseScaleX,
-                                           transform.localScale.y,
-                                           transform.localScale.z);
-
-        // tilt theo hướng y, bù flip
-        float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
-        tilt *= signX;
-
-        transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
     }
 }
