@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public Fish playerFish;
 
+    [Header("Progress Settings")]
+
+    [Header("UI Elements")]
     public Slider progressBar;
     public TMP_Text scoreText;
     public RectTransform milestoneContainer;
@@ -114,12 +117,8 @@ public class GameManager : MonoBehaviour
             milestoneMarkers[currentLevel].GetComponent<Image>().color = Color.green;
         }
 
-        // 🔹 Gọi UI skill draft tại đúng mốc
-        OnReachedThreshold(currentLevel);
-
         currentLevel++;
     }
-
 
     void SetupMilestones()
     {

@@ -78,12 +78,8 @@ public class FishMovement : MonoBehaviour
         // --- Dash input ---
         if (enableDash && !isDashing && Time.time >= nextDashTime)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0)) // click chuột trái
             {
-                // Nếu click trên UI thì bỏ qua
-                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                    return;
-
                 StartDash();
             }
         }

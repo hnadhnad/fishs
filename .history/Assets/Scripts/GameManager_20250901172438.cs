@@ -114,12 +114,8 @@ public class GameManager : MonoBehaviour
             milestoneMarkers[currentLevel].GetComponent<Image>().color = Color.green;
         }
 
-        // 🔹 Gọi UI skill draft tại đúng mốc
-        OnReachedThreshold(currentLevel);
-
         currentLevel++;
     }
-
 
     void SetupMilestones()
     {

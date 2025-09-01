@@ -179,6 +179,7 @@ MonoBehaviour:
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1
   spawnGraceTime: 1.5
+  hungerValue: 10
 --- !u!114 &2537281109041005981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,3 +192,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20f0e47dcadc0114180f9ade58b9dcbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chain: {fileID: 0}
+  uprightLerpSpeed: 2

@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public Fish playerFish;
 
+    [Header("Progress Settings")]
+
+    [Header("UI Elements")]
     public Slider progressBar;
     public TMP_Text scoreText;
     public RectTransform milestoneContainer;
@@ -50,11 +53,6 @@ public class GameManager : MonoBehaviour
         // PlayerFish khởi đầu giữ nguyên size mặc định (set trong prefab / inspector)
         if (scoreText != null) scoreText.text = $"Score: {currentScore}";
         if (progressBar != null) progressBar.value = 0;
-
-        if (SkillDraftUI.Instance != null)
-        {
-            SkillDraftUI.Instance.OnSkillChosen += HandleSkillChosenFromUI;
-        }
 
         SetupMilestones();
     }
@@ -95,7 +93,7 @@ public class GameManager : MonoBehaviour
                 progressBar.value = (currentLevel * stepSize) + (localProgress * stepSize);
             }
         }
-    }
+}
 
 
 
@@ -114,12 +112,8 @@ public class GameManager : MonoBehaviour
             milestoneMarkers[currentLevel].GetComponent<Image>().color = Color.green;
         }
 
-        // 🔹 Gọi UI skill draft tại đúng mốc
-        OnReachedThreshold(currentLevel);
-
         currentLevel++;
     }
-
 
     void SetupMilestones()
     {
@@ -141,35 +135,6 @@ public class GameManager : MonoBehaviour
             rt.anchoredPosition = Vector2.zero;
 
             milestoneMarkers.Add(marker);
-        }
-    }
-    
-    // Gọi hàm này khi vượt qua 1 mốc ăn (thresholdIndex là index mốc trong scoreThresholds)
-    private void OnReachedThreshold(int thresholdIndex)
-    {
-        if (skillDraftsUsed >= maxSkillDrafts) return;
-        if (thresholdIndex >= maxSkillDrafts) return;
-
-        if (SkillDraftUI.Instance != null)
-        {
-            SkillDraftUI.Instance.Show(choicesRemaining);
-        }
-    }
-
-    private void HandleSkillChosenFromUI(int optionIndex)
-    {
-        skillDraftsUsed++;
-
-        if (optionIndex == 0)
-        {
-            // Skip → giữ nguyên số lựa chọn
-            Debug.Log("Player skipped skill choice");
-        }
-        else
-        {
-            // Chọn skill → giảm số lựa chọn cho lần sau (tối thiểu còn 1)
-            Debug.Log($"Player picked skill option: {optionIndex}");
-            choicesRemaining = Mathf.Max(1, choicesRemaining - 1);
         }
     }
 
