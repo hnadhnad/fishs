@@ -187,11 +187,12 @@ public class GameManager : MonoBehaviour
         }
 
         // Nếu chưa set vị trí thì mặc định ở giữa map
-        // Vector2 spawnPos = bossSpawnPos == Vector2.zero
-        //     ? new Vector2((bottomLeft.x + topRight.x) / 2f, (bottomLeft.y + topRight.y) / 2f)
-        //     : bossSpawnPos;
+        Vector2 spawnPos = bossSpawnPos == Vector2.zero
+            ? new Vector2((bottomLeft.x + topRight.x) / 2f, (bottomLeft.y + topRight.y) / 2f)
+            : bossSpawnPos;
 
-        Instantiate(bossPrefab, bossSpawnPos, Quaternion.identity);
+        Instantiate(bossPrefab, spawnPos, Quaternion.identity);
+        Debug.Log("Boss đã được triệu hồi tại: " + spawnPos);
     }
 
 

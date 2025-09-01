@@ -8,11 +8,16 @@ public class MapManager : MonoBehaviour
 
     public Vector2 MapSize { get; private set; }
 
+    [Header("Boss Settings")]
+    public GameObject bossPrefab;     // Kéo prefab Boss vào đây
+    public Vector2 bossSpawnPos;      // Vị trí spawn boss (mặc định giữa map)
+
     void Start()
     {
         SetupMap();
 
         // Triệu hồi boss ngay khi bắt đầu game
+        SpawnBoss();
     }
 
     void SetupMap()
@@ -51,7 +56,22 @@ public class MapManager : MonoBehaviour
         Debug.Log($"Map setup xong! bottomLeft = {bottomLeft}, topRight = {topRight}, size = {MapSize}");
     }
 
+    public void SpawnBoss()
+    {
+        if (bossPrefab == null)
+        {
+            Debug.LogError("⚠️ Chưa gán Boss Prefab trong Inspector!");
+            return;
+        }
 
+        // Nếu chưa set vị trí thì mặc định ở giữa map
+        Vector2 spawnPos = bossSpawnPos == Vector2.zero
+            ? new Vector2((bottomLeft.x + topRight.x) / 2f, (bottomLeft.y + topRight.y) / 2f)
+            : bossSpawnPos;
+
+        Instantiate(bossPrefab, spawnPos, Quaternion.identity);
+        Debug.Log("Boss đã được triệu hồi tại: " + spawnPos);
+    }
 
     // Vẽ Gizmos để nhìn khung map trong Scene
     void OnDrawGizmos()
