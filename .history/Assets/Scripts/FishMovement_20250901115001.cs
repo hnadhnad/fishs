@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI; // thêm namespace UI
-
 
 public class FishMovement : MonoBehaviour
 {
@@ -22,16 +20,13 @@ public class FishMovement : MonoBehaviour
     private float baseScaleX;
 
     [Header("Dash Settings")]
-    public bool enableDash = true;       // bật/tắt dash
-    public float dashForce = 15f;        // lực ban đầu khi dash
-    public float dashDuration = 0.2f;    // thời gian dash
-    public float dashCooldown = 2f;      // hồi chiêu
+    public bool enableDash = true;       // 🔥 bật/tắt dash
+    public float dashForce = 15f;        // lực dash
+    public float dashDuration = 0.2f;    // thời gian giữ tốc độ dash
+    public float dashCooldown = 2f;      // hồi chiêu dash
     private bool isDashing = false;
     private float dashEndTime;
     private float nextDashTime;
-
-    [Header("Dash UI")]
-    public Image dashCooldownImage; 
 
     void Start()
     {
@@ -57,33 +52,12 @@ public class FishMovement : MonoBehaviour
 
     void Update()
     {
-        // --- update UI cooldown ---
-        if (dashCooldownImage != null)
+        // 🟢 Chỉ cho dash khi enableDash = true
+        if (enableDash && Input.GetMouseButtonDown(0) && Time.time >= nextDashTime)
         {
-            if (Time.time < nextDashTime)
-            {
-                // đang hồi chiêu → fill từ 0 → 1
-                float elapsed = dashCooldown - (nextDashTime - Time.time);
-                dashCooldownImage.fillAmount = elapsed / dashCooldown;
-            }
-            else
-            {
-                // đã hồi xong → luôn đầy
-                dashCooldownImage.fillAmount = 1f;
-            }
-        }
-
-        // --- Dash input ---
-        if (enableDash && !isDashing && Time.time >= nextDashTime)
-        {
-            if (Input.GetMouseButtonDown(0)) // click chuột trái
-            {
-                StartDash();
-            }
+            StartDash();
         }
     }
-
-
 
     void FixedUpdate()
     {
@@ -93,45 +67,48 @@ public class FishMovement : MonoBehaviour
         {
             if (Time.time >= dashEndTime)
             {
-                // dash xong thì để lại vận tốc còn sót để giảm dần
                 isDashing = false;
+                currentVelocity = Vector2.zero;
             }
+
+            UpdateVisual(currentVelocity);
+
+            Vector2 dashPos = rb.position + currentVelocity * Time.fixedDeltaTime;
+
+            dashPos.x = Mathf.Clamp(dashPos.x, mapManager.bottomLeft.x, mapManager.topRight.x);
+            dashPos.y = Mathf.Clamp(dashPos.y, mapManager.bottomLeft.y, mapManager.topRight.y);
+
+            rb.MovePosition(dashPos);
+            return;
         }
 
-        if (!isDashing)
+        // ---- di chuyển bình thường ----
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0f;
+
+        Vector2 moveDir = (mouseWorldPos - transform.position);
+        float distance = moveDir.magnitude;
+
+        if (distance > stopDistance)
         {
-            // --- di chuyển bình thường ---
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-
-            Vector2 moveDir = (mouseWorldPos - transform.position);
-            float distance = moveDir.magnitude;
-
-            if (distance > stopDistance)
-            {
-                moveDir.Normalize();
-                currentVelocity = Vector2.MoveTowards(
-                    currentVelocity,
-                    moveDir * maxSpeed,
-                    acceleration * Time.fixedDeltaTime
-                );
-            }
-            else
-            {
-                currentVelocity = Vector2.MoveTowards(
-                    currentVelocity,
-                    Vector2.zero,
-                    deceleration * Time.fixedDeltaTime
-                );
-            }
+            moveDir.Normalize();
+            currentVelocity = Vector2.MoveTowards(
+                currentVelocity,
+                moveDir * maxSpeed,
+                acceleration * Time.fixedDeltaTime
+            );
         }
         else
         {
-            // khi đang dash → velocity giữ nguyên (quán tính sau dash sẽ tính sau)
+            currentVelocity = Vector2.MoveTowards(
+                currentVelocity,
+                Vector2.zero,
+                deceleration * Time.fixedDeltaTime
+            );
         }
 
-        // clamp trong map
         Vector2 newPos = rb.position + currentVelocity * Time.fixedDeltaTime;
+
         newPos.x = Mathf.Clamp(newPos.x, mapManager.bottomLeft.x, mapManager.topRight.x);
         newPos.y = Mathf.Clamp(newPos.y, mapManager.bottomLeft.y, mapManager.topRight.y);
 
@@ -145,12 +122,12 @@ public class FishMovement : MonoBehaviour
         mouseWorldPos.z = 0f;
 
         Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+
         currentVelocity = dashDir * dashForce;
 
         isDashing = true;
         dashEndTime = Time.time + dashDuration;
         nextDashTime = Time.time + dashCooldown;
-
     }
 
     void UpdateVisual(Vector2 moveDir)

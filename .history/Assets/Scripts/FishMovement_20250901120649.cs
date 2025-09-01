@@ -62,28 +62,18 @@ public class FishMovement : MonoBehaviour
         {
             if (Time.time < nextDashTime)
             {
-                // đang hồi chiêu → fill từ 0 → 1
-                float elapsed = dashCooldown - (nextDashTime - Time.time);
-                dashCooldownImage.fillAmount = elapsed / dashCooldown;
+                // đang hồi chiêu → đầy (1) và giảm dần về 0
+                float remaining = nextDashTime - Time.time;
+                dashCooldownImage.fillAmount = remaining / dashCooldown;
             }
             else
             {
-                // đã hồi xong → luôn đầy
-                dashCooldownImage.fillAmount = 1f;
+                // sẵn sàng → luôn trống
+                dashCooldownImage.fillAmount = 0f;
             }
         }
 
-        // --- Dash input ---
-        if (enableDash && !isDashing && Time.time >= nextDashTime)
-        {
-            if (Input.GetMouseButtonDown(0)) // click chuột trái
-            {
-                StartDash();
-            }
-        }
     }
-
-
 
     void FixedUpdate()
     {
@@ -151,6 +141,9 @@ public class FishMovement : MonoBehaviour
         dashEndTime = Time.time + dashDuration;
         nextDashTime = Time.time + dashCooldown;
 
+        // khi dash bắt đầu → icon đầy
+        if (dashCooldownImage != null)
+            dashCooldownImage.fillAmount = 1f;
     }
 
     void UpdateVisual(Vector2 moveDir)

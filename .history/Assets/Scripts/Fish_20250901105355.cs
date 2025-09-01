@@ -125,12 +125,6 @@ public class Fish : MonoBehaviour
             if (isPlayer && GameManager.Instance != null)
             {
                 GameManager.Instance.AddScore(prey.scoreValue);
-
-                // >>> cộng hunger khi player ăn
-                if (PlayerHunger.Instance != null)
-                {
-                    PlayerHunger.Instance.GainHunger(prey.hungerValue);
-                }
             }
 
             Destroy(prey.gameObject);
@@ -149,16 +143,9 @@ public class Fish : MonoBehaviour
             if (isPlayer && GameManager.Instance != null)
             {
                 GameManager.Instance.AddScore(prey.scoreValue);
-
-                // >>> cộng hunger cả khi ăn rong
-                if (PlayerHunger.Instance != null)
-                {
-                    PlayerHunger.Instance.GainHunger(prey.hungerValue);
-                }
             }
         }
     }
-
 
     public void SetSize(float newSize)
     {

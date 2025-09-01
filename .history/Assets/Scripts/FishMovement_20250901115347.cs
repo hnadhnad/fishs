@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI; // thêm namespace UI
-
 
 public class FishMovement : MonoBehaviour
 {
@@ -30,9 +28,6 @@ public class FishMovement : MonoBehaviour
     private float dashEndTime;
     private float nextDashTime;
 
-    [Header("Dash UI")]
-    public Image dashCooldownImage; 
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -57,33 +52,11 @@ public class FishMovement : MonoBehaviour
 
     void Update()
     {
-        // --- update UI cooldown ---
-        if (dashCooldownImage != null)
+        if (enableDash && Input.GetMouseButtonDown(0) && Time.time >= nextDashTime)
         {
-            if (Time.time < nextDashTime)
-            {
-                // đang hồi chiêu → fill từ 0 → 1
-                float elapsed = dashCooldown - (nextDashTime - Time.time);
-                dashCooldownImage.fillAmount = elapsed / dashCooldown;
-            }
-            else
-            {
-                // đã hồi xong → luôn đầy
-                dashCooldownImage.fillAmount = 1f;
-            }
-        }
-
-        // --- Dash input ---
-        if (enableDash && !isDashing && Time.time >= nextDashTime)
-        {
-            if (Input.GetMouseButtonDown(0)) // click chuột trái
-            {
-                StartDash();
-            }
+            StartDash();
         }
     }
-
-
 
     void FixedUpdate()
     {
@@ -145,12 +118,12 @@ public class FishMovement : MonoBehaviour
         mouseWorldPos.z = 0f;
 
         Vector2 dashDir = (mouseWorldPos - transform.position).normalized;
+
         currentVelocity = dashDir * dashForce;
 
         isDashing = true;
         dashEndTime = Time.time + dashDuration;
         nextDashTime = Time.time + dashCooldown;
-
     }
 
     void UpdateVisual(Vector2 moveDir)

@@ -62,14 +62,12 @@ public class FishMovement : MonoBehaviour
         {
             if (Time.time < nextDashTime)
             {
-                // đang hồi chiêu → fill từ 0 → 1
-                float elapsed = dashCooldown - (nextDashTime - Time.time);
-                dashCooldownImage.fillAmount = elapsed / dashCooldown;
+                float remaining = nextDashTime - Time.time;
+                dashCooldownImage.fillAmount = remaining / dashCooldown;
             }
             else
             {
-                // đã hồi xong → luôn đầy
-                dashCooldownImage.fillAmount = 1f;
+                dashCooldownImage.fillAmount = 0f;
             }
         }
 
@@ -82,7 +80,6 @@ public class FishMovement : MonoBehaviour
             }
         }
     }
-
 
 
     void FixedUpdate()
