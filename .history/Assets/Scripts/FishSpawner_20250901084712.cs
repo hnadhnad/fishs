@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Spawner sinh cá (thẳng, lượn sóng, đàn boid), cá đặc biệt (Medium, Big) và tảo.
+/// Spawner sinh cá (thẳng, lượn sóng, đàn boid) và tảo.
 /// Mỗi prefab cá tự đặt size sẵn trong Inspector, không random size nữa.
 /// </summary>
 public class FishSpawner : MonoBehaviour
@@ -22,14 +22,16 @@ public class FishSpawner : MonoBehaviour
     [Range(0f, 1f)] public float waveChance = 0.4f;
     [Range(0f, 1f)] public float boidChance = 0.2f;
 
+
     [Header("Boid Settings")]
     public int boidGroupSize = 5;
 
     [Header("Algae Settings")]
-    public GameObject algaePrefab;    // prefab AlgaeChain
-    public Vector2[] algaePositions;  // danh sách vị trí spawn tảo cố định
+    public GameObject algaePrefab;
+    public int maxAlgaeCount = 7;
 
     private float timer = 0f;
+    private float algaeTimer = 0f;
 
     [Header("Medium Fish Settings")]
     public GameObject mediumFishPrefab;
@@ -41,15 +43,10 @@ public class FishSpawner : MonoBehaviour
     public float bigFishSpawnInterval = 10f; // khoảng cách thời gian spawn
     private float bigFishTimer = 0f;
 
-    void Start()
-    {
-        // spawn algae khi bắt đầu map
-        SpawnAlgae();
-    }
 
     void Update()
     {
-        // spawn cá thường
+        // spawn cá
         timer += Time.deltaTime;
         if (timer >= spawnInterval)
         {
@@ -57,7 +54,7 @@ public class FishSpawner : MonoBehaviour
             SpawnFish();
         }
 
-        // spawn MediumFish riêng
+       // spawn MediumFish riêng
         mediumFishTimer += Time.deltaTime;
         if (mediumFishTimer >= mediumFishSpawnInterval)
         {
@@ -72,6 +69,7 @@ public class FishSpawner : MonoBehaviour
             bigFishTimer = 0f;
             SpawnBigFish();
         }
+
     }
 
     void SpawnFish()
@@ -111,6 +109,7 @@ public class FishSpawner : MonoBehaviour
         }
     }
 
+
     void SetupDirection(GameObject go, int dir)
     {
         // FishStraight
@@ -121,7 +120,7 @@ public class FishSpawner : MonoBehaviour
         // FishWave
         FishWave wave = go.GetComponent<FishWave>();
         if (wave != null)
-            wave.direction = dir;   // chỉ set direction, đừng nhân speed
+            wave.direction = dir;   // 👈 chỉ set direction, đừng nhân speed
 
         // Boid
         Boid boid = go.GetComponent<Boid>();
@@ -134,6 +133,7 @@ public class FishSpawner : MonoBehaviour
                                             go.transform.localScale.z);
     }
 
+
     void SpawnMediumFish()
     {
         bool spawnLeft = Random.value < 0.5f;
@@ -145,14 +145,16 @@ public class FishSpawner : MonoBehaviour
 
         var go = Instantiate(mediumFishPrefab, spawnPos, Quaternion.identity);
 
+        // 👇 THÊM: gán hướng cho MediumFish
         MediumFish mf = go.GetComponent<MediumFish>();
         if (mf != null) mf.direction = dir;
 
+        // 👇 THÊM: lật mặt theo hướng
         go.transform.localScale = new Vector3(dir * Mathf.Abs(go.transform.localScale.x),
                                             go.transform.localScale.y,
                                             go.transform.localScale.z);
     }
-
+    
     void SpawnBigFish()
     {
         bool spawnLeft = Random.value < 0.5f;
@@ -172,16 +174,6 @@ public class FishSpawner : MonoBehaviour
                                             go.transform.localScale.z);
     }
 
-    void SpawnAlgae()
-    {
-        if (algaePrefab == null) return;
 
-        if (algaePositions != null && algaePositions.Length > 0)
-        {
-            foreach (Vector2 pos in algaePositions)
-            {
-                Instantiate(algaePrefab, pos, Quaternion.identity);
-            }
-        }
-    }
+
 }

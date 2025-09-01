@@ -1295,12 +1295,9 @@ MonoBehaviour:
   waveChance: 0.5
   boidChance: 0.1
   boidGroupSize: 5
-  algaePrefab: {fileID: 2292341620835738631, guid: 030e1d81c9f661c468a1a329a50fa03e, type: 3}
-  maxAlgaeCount: 10
-  algaeY: -4
-  algaeXSpacing: 1
-  algaeXRange: {x: -10, y: 10}
-  algaeSpawnInterval: 5
+  algaePrefab: {fileID: 6611692767184020874, guid: d83b0b821cb934042a46e751ff83605f, type: 3}
+  algaePositions:
+  - {x: 5, y: -6}
   mediumFishPrefab: {fileID: 5646906281059797155, guid: 13c90bf4deb027a448125a0d87016f22, type: 3}
   mediumFishSpawnInterval: 4
   bigFishPrefab: {fileID: 2364920184561514178, guid: 7c6c745282ed8454ab6eb29adb1169e0, type: 3}

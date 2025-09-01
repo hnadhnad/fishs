@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2434142124693055166}
   - component: {fileID: -1007771381625427963}
   - component: {fileID: 5632958000276287549}
-  - component: {fileID: 8090896633794741103}
-  - component: {fileID: -231485217520092462}
+  - component: {fileID: 6081952553893031997}
+  - component: {fileID: 2537281109041005981}
   m_Layer: 0
   m_Name: Algae
   m_TagString: Untagged
@@ -117,7 +117,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -146,9 +146,9 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_LinearDrag: 1.5
+  m_AngularDrag: 2.5
+  m_GravityScale: -0.25
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -160,7 +160,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &8090896633794741103
+--- !u!114 &6081952553893031997
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -173,13 +173,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
-  scoreValue: 5
-  size: 0.5
+  scoreValue: 10
+  size: 0.7
   eatSound: {fileID: 0}
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1
   spawnGraceTime: 1.5
---- !u!114 &-231485217520092462
+--- !u!114 &2537281109041005981
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,9 +188,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2292341620835738631}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bb493a624996004c92e1ee31bba87a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 20f0e47dcadc0114180f9ade58b9dcbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growHeight: 1
-  growSpeed: 1
-  stopDelay: 0.2
