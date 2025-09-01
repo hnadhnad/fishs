@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 175771864}
   - component: {fileID: 175771863}
   - component: {fileID: 175771862}
+  - component: {fileID: 175771865}
   m_Layer: 5
   m_Name: Button_Option2
   m_TagString: Untagged
@@ -315,6 +316,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175771860}
   m_CullTransparentMesh: 1
+--- !u!114 &175771865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175771860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6007d39c18a086045a34840f4682246a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillId: 2
 --- !u!1 &214748909
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,6 +588,7 @@ GameObject:
   - component: {fileID: 243064401}
   - component: {fileID: 243064400}
   - component: {fileID: 243064399}
+  - component: {fileID: 243064402}
   m_Layer: 5
   m_Name: Button_Skip
   m_TagString: Untagged
@@ -683,6 +698,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 243064397}
   m_CullTransparentMesh: 1
+--- !u!114 &243064402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243064397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6007d39c18a086045a34840f4682246a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillId: 0
 --- !u!1 &521525955
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +913,7 @@ GameObject:
   - component: {fileID: 581192771}
   - component: {fileID: 581192770}
   - component: {fileID: 581192769}
+  - component: {fileID: 581192772}
   m_Layer: 5
   m_Name: Button_Option3
   m_TagString: Untagged
@@ -994,6 +1023,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 581192767}
   m_CullTransparentMesh: 1
+--- !u!114 &581192772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581192767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6007d39c18a086045a34840f4682246a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillId: 3
 --- !u!1 &594773312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,7 +1093,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Skill 3
+  m_text: Hungry
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1408,6 +1450,50 @@ PrefabInstance:
       addedObject: {fileID: 920995814}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 07ba4e8f779e876448428d9f7dd4a9be, type: 3}
+--- !u!1 &723887127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 723887129}
+  - component: {fileID: 723887128}
+  m_Layer: 0
+  m_Name: SkillManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &723887128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723887127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d98eba1a5f2674a49b85904533cc10c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &723887129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 723887127}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 425.75537, y: 62.41356, z: -3.6392274}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &795024755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1608,7 +1694,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Skill 1
+  m_text: Speed
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1697,6 +1783,7 @@ GameObject:
   - component: {fileID: 895072890}
   - component: {fileID: 895072889}
   - component: {fileID: 895072888}
+  - component: {fileID: 895072891}
   m_Layer: 5
   m_Name: Button_Option1
   m_TagString: Untagged
@@ -1806,6 +1893,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 895072886}
   m_CullTransparentMesh: 1
+--- !u!114 &895072891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 895072886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6007d39c18a086045a34840f4682246a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillId: 1
 --- !u!1 &920995813
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,7 +2318,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Skill 2
+  m_text: Dash
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2563,7 +2663,7 @@ MonoBehaviour:
   stopDistance: 0.1
   maxTiltAngle: 25
   tiltLerpSpeed: 6
-  enableDash: 1
+  enableDash: 0
   dashForce: 15
   dashDuration: 0.2
   dashCooldown: 2
@@ -2722,6 +2822,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981122dddab305e4ea78ad6867b1d7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableSpawning: 0
   fishStraightPrefab: {fileID: 8731333114310471846, guid: 420923aafe36d434aaa4daefa1ee2824, type: 3}
   fishWavePrefab: {fileID: 8731333114310471846, guid: c0accffeb1812ec4fbd20c786377960c, type: 3}
   boidPrefab: {fileID: 8731333114310471846, guid: 0fab842938c1dee47bc1c97982a6fd7f, type: 3}
@@ -2931,3 +3032,4 @@ SceneRoots:
   - {fileID: 521525957}
   - {fileID: 804109469}
   - {fileID: 676778631}
+  - {fileID: 723887129}

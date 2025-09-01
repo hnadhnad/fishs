@@ -45,8 +45,8 @@ public class FishSpawner : MonoBehaviour
 
     void Start()
     {
-        if (enableSpawning)
-            SpawnAlgae();
+        // spawn algae khi bắt đầu map
+        SpawnAlgae();
     }
 
     void Update()

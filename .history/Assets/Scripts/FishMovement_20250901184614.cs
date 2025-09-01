@@ -59,14 +59,8 @@ public class FishMovement : MonoBehaviour
 
     void Update()
     {
-        // --- Hiển thị/ẩn icon theo enableDash ---
-        if (dashCooldownImage != null)
-        {
-            dashCooldownImage.enabled = enableDash; // bật/tắt icon theo enableDash
-        }
-
         // --- update UI cooldown ---
-        if (enableDash && dashCooldownImage != null)
+        if (dashCooldownImage != null)
         {
             if (Time.time < nextDashTime)
             {
@@ -94,7 +88,6 @@ public class FishMovement : MonoBehaviour
             }
         }
     }
-
 
 
 

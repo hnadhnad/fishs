@@ -7,7 +7,7 @@ using UnityEngine;
 public class FishSpawner : MonoBehaviour
 {
     [Header("Spawner Toggle")]
-    [SerializeField]public bool enableSpawning = true; 
+    public bool enableSpawning = true; 
     [Header("Prefabs")]
     public GameObject fishStraightPrefab;
     public GameObject fishWavePrefab;
@@ -45,8 +45,8 @@ public class FishSpawner : MonoBehaviour
 
     void Start()
     {
-        if (enableSpawning)
-            SpawnAlgae();
+        // spawn algae khi bắt đầu map
+        SpawnAlgae();
     }
 
     void Update()
