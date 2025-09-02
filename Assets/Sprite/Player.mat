@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: angelfish
+  m_Name: Player
   m_Shader: {fileID: -6465566751694194690, guid: b84e365056c019245a560259bdde5262, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -53,18 +53,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Amplitude: 0.1
+    - _Amplitude: 0.01
     - _EnableExternalAlpha: 0
-    - _Frequency: 15
-    - _Offset: 0.738
-    - _Speed: -12
-    - _TailPower: 7
+    - _Frequency: 5
+    - _Offset: 0.113
+    - _Speed: -7
+    - _TailPower: 4
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &1695900641743110043
+--- !u!114 &3210506801160095357
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

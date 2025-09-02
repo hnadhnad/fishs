@@ -2628,8 +2628,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.4615386, y: 2.4615386}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 2.6153846, y: 2.4615386}
+    newSize: {x: 0.34, y: 0.32}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -2657,7 +2657,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 498599c59a6240d4d87c31b23378ef54, type: 2}
+  - {fileID: 2100000, guid: d7a7fb4ae29471d4aa5f8b9d99abb112, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2683,7 +2683,7 @@ SpriteRenderer:
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.34, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2881,7 +2881,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981122dddab305e4ea78ad6867b1d7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableSpawning: 0
+  enableSpawning: 1
   fishStraightPrefab: {fileID: 8731333114310471846, guid: 420923aafe36d434aaa4daefa1ee2824, type: 3}
   fishWavePrefab: {fileID: 8731333114310471846, guid: c0accffeb1812ec4fbd20c786377960c, type: 3}
   boidPrefab: {fileID: 8731333114310471846, guid: 0fab842938c1dee47bc1c97982a6fd7f, type: 3}

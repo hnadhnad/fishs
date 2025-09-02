@@ -56,7 +56,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d970609b18968414ebabdf550c01f61e, type: 2}
+  - {fileID: 2100000, guid: 693e3a150bf33524f9625b0240d9381d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.34, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -100,12 +100,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a92b4f6b437972469e722226dd37a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minSpeed: 1.5
+  maxSpeed: 3
   speed: 2
   neighborRadius: 5
   separationRadius: 5
   initialSize: 0.8
   verticalInfluence: 0.75
   horizontalBias: 0.4
+  speedOscillationAmplitude: 0.3
+  speedOscillationFrequency: 1.5
+  maxTiltAngle: 25
+  tiltLerpSpeed: 5
   velocity: {x: 0, y: 0}
   fleeRadius: 7
 --- !u!50 &7392789859516798649
@@ -189,3 +195,4 @@ MonoBehaviour:
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1
   spawnGraceTime: 0.5
+  hungerValue: 10

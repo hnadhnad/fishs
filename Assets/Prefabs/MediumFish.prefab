@@ -56,7 +56,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 312cdc526d3a7a8479d5eb73433adc94, type: 2}
+  - {fileID: 2100000, guid: 6fdbc26e0b2d1bd4db4a5693ca6c338c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 0.32, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -105,6 +105,7 @@ MonoBehaviour:
   waveFrequency: 2
   chaseRadius: 8
   fleeRadius: 7
+  maxTiltAngle: 15
   direction: -1
 --- !u!50 &5283643769860564251
 Rigidbody2D:
@@ -187,3 +188,4 @@ MonoBehaviour:
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1
   spawnGraceTime: 1.5
+  hungerValue: 10
