@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Fish))]
-
 public class Boss : MonoBehaviour
 {
     private Fish fish;
+
     [Header("Boss Stats")]
     public float maxHealth = 1000f;
     public float currentHealth;
@@ -14,12 +14,13 @@ public class Boss : MonoBehaviour
     public float currentHunger;
 
     [Header("Decay Settings")]
-    public float hungerDecayRate = 5f;      // tốc độ đói giảm theo giây
-    public float hungerDamageRate = 10f;    // tốc độ trừ máu/giây khi đói = 0
+    public float hungerDecayRate = 5f;   // tốc độ đói giảm theo giây
+    public float hungerDamageRate = 10f; // tốc độ trừ máu/giây khi đói = 0
 
-    [Header("UI")]
-    public Slider healthBar;
-    public Slider hungerBar;
+    [Header("UI References")]
+    public GameObject bossUIPanel;   // gắn BossUI ở Canvas
+    public Slider healthBar;         // gắn HealthBar Slider
+    public Slider hungerBar;         // gắn HungerBar Slider
 
     [Header("Phase Settings")]
     public BossPhase currentPhase = BossPhase.Phase1;
@@ -28,6 +29,7 @@ public class Boss : MonoBehaviour
     {
         fish = GetComponent<Fish>();
     }
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -35,6 +37,9 @@ public class Boss : MonoBehaviour
 
         if (healthBar != null) healthBar.maxValue = maxHealth;
         if (hungerBar != null) hungerBar.maxValue = maxHunger;
+
+        // 🔥 Boss mới spawn -> bật UI
+        if (bossUIPanel != null) bossUIPanel.SetActive(true);
     }
 
     void Update()
@@ -55,6 +60,13 @@ public class Boss : MonoBehaviour
         if (hungerBar != null) hungerBar.value = currentHunger;
 
         HandlePhaseLogic();
+
+        // Nếu chết -> tắt UI
+        if (currentHealth <= 0)
+        {
+            if (bossUIPanel != null) bossUIPanel.SetActive(false);
+            Destroy(gameObject);
+        }
     }
 
     public void TakeDamage(float amount)

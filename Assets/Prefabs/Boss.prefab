@@ -100,15 +100,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73489d3983079a64f9fe2dae1c384133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1000
+  maxHealth: 100
   currentHealth: 0
-  maxHunger: 500
+  maxHunger: 100
   currentHunger: 0
-  hungerDecayRate: 5
-  hungerDamageRate: 10
+  hungerDecayRate: 10
+  hungerDamageRate: 1
+  bossUIPanel: {fileID: 8369455734696212161, guid: 34a4cf1416320f94da9c10513eae9d5f, type: 3}
   healthBar: {fileID: 0}
   hungerBar: {fileID: 0}
-  currentPhase: 0
+  fish: {fileID: 0}
+  animator: {fileID: 0}
+  moveSpeed: 6
+  chaseLureSpeed: 6
+  phase1DashCount: 3
+  phase1DashDistance: 1
+  phase1DashDuration: 0.25
+  phase1DashInterval: 0.5
+  phase1DashImpactPause: 0.12
+  phase1BulletPrefab: {fileID: 1547457209301159574, guid: a6a246ab37bd18a4fb9ee432871b8293, type: 3}
+  phase1ShootCount: 3
+  phase1BulletSpawnOffset: 1.5
+  phase1ShootInterval: 0.5
+  phase1BulletSpeed: 4
+  phase1CyclePause: 0.4
+  phase1RetreatHungerFraction: 0.5
+  phase1ExitOffset: 2
+  phase1ExitDistance: 6
+  phase1OutsideWait: 1
+  phase1LurePrefab: {fileID: 4208229999376911092, guid: d93e24c9044952e44a3552dc1b07ec91, type: 3}
+  phase1LureSpeed: 3
+  phase1LureSpawnForward: 3
+  phase1LureClaimTime: 3
+  phase1LureHealAmount: 150
+  phase1PostLureDashCount: 2
+  phase1PostLureShootCount: 5
+  phase1AfterLurePause: 0.5
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4
@@ -165,7 +192,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -194,8 +221,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
+  isAlgae: 0
+  isBoss: 1
+  isLure: 0
   scoreValue: 10
-  size: 1
+  size: 1.2
   eatSound: {fileID: 0}
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1

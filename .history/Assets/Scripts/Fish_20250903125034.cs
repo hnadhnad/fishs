@@ -12,8 +12,6 @@ public class Fish : MonoBehaviour
     public bool isPlayer = false;
     public bool isAlgae = false;   
     public bool isBoss = false;   // ✅ Thêm biến Boss
-    public bool isLure = false;   // ✅ thêm cho lure
-
 
     [Header("Score")]
     public int scoreValue = 10;
@@ -59,7 +57,7 @@ public class Fish : MonoBehaviour
     protected virtual void Update()
     {
         // Boss thì không despawn bao giờ (chỉ chết khi máu = 0 trong script Boss)
-        if (isBoss || isLure) return;
+        if (isBoss) return;
 
         // chỉ kiểm tra despawn sau khoảng spawnGraceTime
         if (Time.time - spawnTime < spawnGraceTime) return;

@@ -12,8 +12,6 @@ public class Fish : MonoBehaviour
     public bool isPlayer = false;
     public bool isAlgae = false;   
     public bool isBoss = false;   // ✅ Thêm biến Boss
-    public bool isLure = false;   // ✅ thêm cho lure
-
 
     [Header("Score")]
     public int scoreValue = 10;
@@ -59,7 +57,7 @@ public class Fish : MonoBehaviour
     protected virtual void Update()
     {
         // Boss thì không despawn bao giờ (chỉ chết khi máu = 0 trong script Boss)
-        if (isBoss || isLure) return;
+        if (isBoss) return;
 
         // chỉ kiểm tra despawn sau khoảng spawnGraceTime
         if (Time.time - spawnTime < spawnGraceTime) return;
@@ -135,7 +133,7 @@ public class Fish : MonoBehaviour
                 }
             }
 
-            prey.Die(); // ✅ gọi Die() thay vì Destroy trực tiếp
+            Destroy(prey.gameObject);
         }
 
         // Nếu prey là algae thì xử lý VFX/score ở đây
@@ -163,28 +161,5 @@ public class Fish : MonoBehaviour
     {
         size = newSize;
         ApplyScale();
-    }
-
-    /// <summary>
-    /// Hàm chết chung cho Player/Enemy
-    /// </summary>
-    public virtual void Die()
-    {
-        if (isPlayer)
-        {
-            Debug.Log("Player chết!");
-
-            // VFX chết
-            if (eatVfxPrefab != null)
-                Instantiate(eatVfxPrefab, transform.position, Quaternion.identity);
-
-            // SFX chết
-            if (eatSound != null)
-                AudioSource.PlayClipAtPoint(eatSound, Camera.main.transform.position);
-
- 
-        }
-
-        Destroy(gameObject);
     }
 }

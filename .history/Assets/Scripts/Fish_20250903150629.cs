@@ -59,7 +59,7 @@ public class Fish : MonoBehaviour
     protected virtual void Update()
     {
         // Boss thì không despawn bao giờ (chỉ chết khi máu = 0 trong script Boss)
-        if (isBoss || isLure) return;
+        if (isBoss) return;
 
         // chỉ kiểm tra despawn sau khoảng spawnGraceTime
         if (Time.time - spawnTime < spawnGraceTime) return;
