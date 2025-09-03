@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 69
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -111,7 +111,7 @@ MonoBehaviour:
   hungerBar: {fileID: 0}
   fish: {fileID: 0}
   animator: {fileID: 0}
-  moveSpeed: 6
+  moveSpeed: 5
   chaseLureSpeed: 5
   phase1DashCount: 3
   phase1DashDistance: 10
@@ -121,8 +121,8 @@ MonoBehaviour:
   phase1BulletPrefab: {fileID: 1547457209301159574, guid: a6a246ab37bd18a4fb9ee432871b8293, type: 3}
   phase1ShootCount: 3
   phase1BulletSpawnOffset: 1.5
-  phase1ShootInterval: 0.5
-  phase1BulletSpeed: 4
+  phase1ShootInterval: 0.7
+  phase1BulletSpeed: 5
   phase1CyclePause: 0.4
   phase1RetreatHungerFraction: 0.5
   phase1ExitDistance: 6
@@ -133,6 +133,19 @@ MonoBehaviour:
   phase1PostLureDashCount: 2
   phase1PostLureShootCount: 5
   phase1AfterLurePause: 0.5
+  phase2ChaseMultiplier: 0.8
+  phase2BombPrefab: {fileID: 2219026909169114358, guid: b02193bb012184247b011a26c708e15c, type: 3}
+  phase2BombPerCycle: 5
+  phase2BombInterval: 0.6
+  phase2BombRadius: 3
+  phase2BombDelay: 2
+  phase2BombDamage: 10
+  phase2BossStunDuration: 4
+  meatPrefab: {fileID: 4904525448659230853, guid: 0e834323c8c52ca4e80d24fa29be7766, type: 3}
+  phase2MeatCount: 4
+  phase2MeatSpawnOffset: 5
+  phase2MeatScatterSpeed: 3
+  phase2EatMeatSpeed: 4
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4

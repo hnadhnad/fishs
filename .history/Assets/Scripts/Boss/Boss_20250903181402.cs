@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 [RequireComponent(typeof(Fish))]
 public class Boss : MonoBehaviour
@@ -104,34 +103,46 @@ public class Boss : MonoBehaviour
     [Tooltip("Thời gian nghỉ sau khi ăn lure trước khi tiếp tục vòng mới")]
     public float phase1AfterLurePause = 0.5f;
 
-    // ================= PHASE 2 =================
-    [Header("Phase2 - Chase & Bomb")]
-    public float phase2ChaseMultiplier = 1.2f;   // Boss dí player nhanh hơn (x tốc độ gốc)
-    public GameObject phase2BombPrefab;          // Prefab bomb
-    public int phase2BombPerCycle = 5;           // Mỗi lượt bắn 5 trái bomb
-    public float phase2BombInterval = 0.8f;      // Delay giữa các bomb
-    public float phase2BombRadius = 3f;          // Bán kính nổ
-    public float phase2BombDelay = 1.5f;         // Thời gian cảnh báo trước khi nổ
-    public float phase2BombDamage = 200f;        // Boss mất máu nếu dính bomb
-    public float phase2BossStunDuration = 2f;    // Thời gian Boss bị choáng sau khi dính bomb
-    public float phase2PreShootDelay = 0.3f;
+    // -------- Phase 2 (Thả bom) -------------
+    [Header("Phase2 - Chase")]
+    [Tooltip("Hệ số nhân tốc độ boss khi dí player trong Phase2")]
+    public float phase2ChaseMultiplier = 1.2f;
 
+    [Header("Phase2 - Bomb/Volley")]
+    [Tooltip("Prefab bom (attach FallingBomb)")]
+    public GameObject phase2BombPrefab;
 
-    [Header("Phase2 - Meat drop")]
-[Header("Phase2 - Meat drop")]
-    public GameObject meatPrefab;             // Prefab miếng thịt
-    public int phase2MeatCount = 4;           // Số lượng thịt rơi
-    public float phase2MeatSpawnOffset = 1f;  // Khoảng cách spawn thịt so với boss
-    public float phase2MeatScatterSpeed = 3f; // Tốc độ thịt bay ra ngoài
+    [Tooltip("Số bom mỗi volley (thường 5)")]
+    public int phase2BombCount = 5;
 
-    public float phase2EatMeatSpeed = 3f;        // Tốc độ boss di chuyển để ăn thịt
+    [Tooltip("Khoảng thời gian giữa 2 quả bom trong vòng volley")]
+    public float phase2BombInterval = 0.6f;
 
-    // Boss bị stun timer
-    private float stunTimer = 0f;
-    public bool IsStunned => stunTimer > 0f;
+    [Tooltip("Thời gian boss đợi giữa 2 volley")]
+    public float phase2VolleyPause = 1.2f;
 
-    private bool isInvulnerable = false;
+    [Tooltip("Số quả cuối cùng trong volley khiến boss mệt đứng yên")]
+    public int phase2FinalBombsThatExhaust = 2;
 
+    [Header("Phase2 - Bomb flight")]
+    [Tooltip("Độ cao spawn bom so với mép trên map")]
+    public float phase2BombSpawnHeight = 6f;
+
+    [Tooltip("Thời gian rơi của bom (giây)")]
+    public float phase2BombFallDuration = 0.9f;
+
+    [Tooltip("Bán kính nổ ảnh hưởng (units)")]
+    public float phase2BombExplodeRadius = 1.6f;
+
+    [Tooltip("Damage bom gây lên boss nếu trúng")]
+    public float phase2BombDamage = 120f;
+
+    [Header("Phase2 - Meat (after explosion)")]
+    [Tooltip("Prefab mảnh thịt (là prefab có Fish component)")]
+    public GameObject phase2MeatPrefab;
+
+    [Tooltip("Số mảnh thịt spawn khi bom nổ (ví dụ 4 hướng)")]
+    public int phase2MeatCount = 4;
 
 
     void Awake()
@@ -159,15 +170,11 @@ public class Boss : MonoBehaviour
 
     void Start()
     {
-        // Nếu chưa set trong Inspector thì mặc định full máu/đói
-        if (currentHealth <= 0) currentHealth = maxHealth;
-        if (currentHunger <= 0) currentHunger = maxHunger;
+        currentHealth = maxHealth;
+        currentHunger = maxHunger;
 
         if (healthBar != null) healthBar.maxValue = maxHealth;
         if (hungerBar != null) hungerBar.maxValue = maxHunger;
-
-        if (healthBar != null) healthBar.value = currentHealth;
-        if (hungerBar != null) hungerBar.value = currentHunger;
 
         if (bossUIPanel != null)
             bossUIPanel.SetActive(true);
@@ -175,7 +182,6 @@ public class Boss : MonoBehaviour
         // ✅ Bắt đầu ở Phase1
         ChangeState(new BossPhase1State());
     }
-
 
     void Update()
     {
@@ -191,14 +197,6 @@ public class Boss : MonoBehaviour
 
         if (healthBar != null) healthBar.value = currentHealth;
         if (hungerBar != null) hungerBar.value = currentHunger;
-
-                // 🔥 Giảm stunTimer theo thời gian
-        if (stunTimer > 0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if (stunTimer < 0f) stunTimer = 0f;
-        }
-
 
         // Update logic của state hiện tại
         currentState?.Update(this);
@@ -225,31 +223,15 @@ public class Boss : MonoBehaviour
         currentState = newState;
         currentState.Enter(this);
     }
-    public void TakeDamage(float dmg, float stunDuration)
+    public void TakeDamage(float amount)
     {
-        // Nếu đang stun và invulnerable thì bỏ qua dame mới
-        if (isInvulnerable) return;
-
-        currentHealth = Mathf.Max(0, currentHealth - dmg);
-        Stun(stunDuration);
-
-        if (currentHealth <= 0) Die();
+        currentHealth -= amount;
+        if (currentHealth <= 0f)
+        {
+            currentHealth = 0f;
+            Die();
+        }
     }
-
-    public void Stun(float duration)
-    {
-        stunTimer = duration;
-        isInvulnerable = true;
-        StartCoroutine(ClearInvulnerability(duration));
-    }
-
-    private IEnumerator ClearInvulnerability(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isInvulnerable = false;
-    }
-
-
 
 
     void Die()

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 [RequireComponent(typeof(Fish))]
 public class Boss : MonoBehaviour
@@ -114,8 +113,6 @@ public class Boss : MonoBehaviour
     public float phase2BombDelay = 1.5f;         // Thời gian cảnh báo trước khi nổ
     public float phase2BombDamage = 200f;        // Boss mất máu nếu dính bomb
     public float phase2BossStunDuration = 2f;    // Thời gian Boss bị choáng sau khi dính bomb
-    public float phase2PreShootDelay = 0.3f;
-
 
     [Header("Phase2 - Meat drop")]
 [Header("Phase2 - Meat drop")]
@@ -129,9 +126,6 @@ public class Boss : MonoBehaviour
     // Boss bị stun timer
     private float stunTimer = 0f;
     public bool IsStunned => stunTimer > 0f;
-
-    private bool isInvulnerable = false;
-
 
 
     void Awake()
@@ -159,15 +153,11 @@ public class Boss : MonoBehaviour
 
     void Start()
     {
-        // Nếu chưa set trong Inspector thì mặc định full máu/đói
-        if (currentHealth <= 0) currentHealth = maxHealth;
-        if (currentHunger <= 0) currentHunger = maxHunger;
+        currentHealth = maxHealth;
+        currentHunger = maxHunger;
 
         if (healthBar != null) healthBar.maxValue = maxHealth;
         if (hungerBar != null) hungerBar.maxValue = maxHunger;
-
-        if (healthBar != null) healthBar.value = currentHealth;
-        if (hungerBar != null) hungerBar.value = currentHunger;
 
         if (bossUIPanel != null)
             bossUIPanel.SetActive(true);
@@ -175,7 +165,6 @@ public class Boss : MonoBehaviour
         // ✅ Bắt đầu ở Phase1
         ChangeState(new BossPhase1State());
     }
-
 
     void Update()
     {
@@ -191,14 +180,6 @@ public class Boss : MonoBehaviour
 
         if (healthBar != null) healthBar.value = currentHealth;
         if (hungerBar != null) hungerBar.value = currentHunger;
-
-                // 🔥 Giảm stunTimer theo thời gian
-        if (stunTimer > 0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if (stunTimer < 0f) stunTimer = 0f;
-        }
-
 
         // Update logic của state hiện tại
         currentState?.Update(this);
@@ -225,30 +206,16 @@ public class Boss : MonoBehaviour
         currentState = newState;
         currentState.Enter(this);
     }
-    public void TakeDamage(float dmg, float stunDuration)
+    public void TakeDamage(float dmg)
     {
-        // Nếu đang stun và invulnerable thì bỏ qua dame mới
-        if (isInvulnerable) return;
-
         currentHealth = Mathf.Max(0, currentHealth - dmg);
-        Stun(stunDuration);
-
         if (currentHealth <= 0) Die();
     }
 
     public void Stun(float duration)
     {
         stunTimer = duration;
-        isInvulnerable = true;
-        StartCoroutine(ClearInvulnerability(duration));
     }
-
-    private IEnumerator ClearInvulnerability(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isInvulnerable = false;
-    }
-
 
 
 

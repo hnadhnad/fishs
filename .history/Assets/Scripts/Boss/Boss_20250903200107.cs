@@ -114,8 +114,6 @@ public class Boss : MonoBehaviour
     public float phase2BombDelay = 1.5f;         // Thời gian cảnh báo trước khi nổ
     public float phase2BombDamage = 200f;        // Boss mất máu nếu dính bomb
     public float phase2BossStunDuration = 2f;    // Thời gian Boss bị choáng sau khi dính bomb
-    public float phase2PreShootDelay = 0.3f;
-
 
     [Header("Phase2 - Meat drop")]
 [Header("Phase2 - Meat drop")]

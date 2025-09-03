@@ -24,16 +24,8 @@ public class BossPhase2State : IBossState
         if (boss.hungerBar != null)
             boss.hungerBar.gameObject.SetActive(false);
 
-        // 🔥 Dọn sạch lure còn sót lại của phase 1
-        var lures = GameObject.FindGameObjectsWithTag("Lure");
-        foreach (var lure in lures)
-        {
-            if (lure != null) Object.Destroy(lure);
-        }
-
         routine = boss.StartCoroutine(PhaseRoutine(boss));
     }
-
 
 
     public void Update(Boss boss) { }

@@ -24,16 +24,8 @@ public class BossPhase2State : IBossState
         if (boss.hungerBar != null)
             boss.hungerBar.gameObject.SetActive(false);
 
-        // 🔥 Dọn sạch lure còn sót lại của phase 1
-        var lures = GameObject.FindGameObjectsWithTag("Lure");
-        foreach (var lure in lures)
-        {
-            if (lure != null) Object.Destroy(lure);
-        }
-
         routine = boss.StartCoroutine(PhaseRoutine(boss));
     }
-
 
 
     public void Update(Boss boss) { }
@@ -72,62 +64,19 @@ public class BossPhase2State : IBossState
             }
 
             // 🔁 Pattern loop
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 3); // bắn 3 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 2); // bắn 2 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 1); // bắn 1 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 0); // thả bomb
 
             // ✅ Sau pattern → boss đi ăn thịt (nếu có)
             yield return EatAllMeat(boss);
         }
     }
-    private IEnumerator BombThenShoot(Boss boss, Transform playerT, int shootCount)
-    {
-        // Spawn bomb vào vị trí player hiện tại
-        Vector3 targetPos = (playerT != null) ? playerT.position : boss.transform.position;
-        SpawnBomb(boss, targetPos);
-
-        // ⏸ Chờ interval nhưng hủy nếu boss bị stun
-        float elapsed = 0f;
-        while (elapsed < boss.phase2BombInterval)
-        {
-            if (boss == null || boss.IsStunned)
-                yield break; // ❌ dừng action nếu đang choáng
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        if (shootCount > 0)
-            yield return new WaitForSeconds(boss.phase2PreShootDelay);
-        // Nếu có bắn → dùng skill bắn của phase 1
-        if (shootCount > 0 && playerT != null && boss.phase1BulletPrefab != null)
-        {
-            for (int i = 0; i < shootCount; i++)
-            {
-                if (playerT == null || boss == null || boss.IsStunned)
-                    yield break; // ❌ hủy luôn nếu boss bị stun trong khi chuẩn bị bắn
-
-                Vector3 dir = (playerT.position - boss.transform.position).normalized;
-                Vector3 spawnPos = boss.transform.position + dir * boss.phase1BulletSpawnOffset;
-
-                GameObject bullet = Object.Instantiate(boss.phase1BulletPrefab, spawnPos, Quaternion.identity);
-                if (bullet.TryGetComponent<Rigidbody2D>(out var rb))
-                    rb.velocity = dir * boss.phase1BulletSpeed;
-
-                float wait = boss.phase1ShootInterval;
-                float t = 0f;
-                while (t < wait)
-                {
-                    if (boss == null || boss.IsStunned)
-                        yield break; // ❌ nếu đang stun thì dừng bắn
-                    t += Time.deltaTime;
-                    yield return null;
-                }
-            }
-        }
-    }
-
-
-
 
 
     private void SpawnBomb(Boss boss, Vector3 targetPosition)
@@ -154,6 +103,26 @@ public class BossPhase2State : IBossState
     /// <summary>
     /// Boss chạy về player nhưng tránh vùng bomb.
     /// </summary>
+    private void MoveTowardsPlayerAvoidingBombs(Boss boss, Vector3 playerPos)
+    {
+        Vector3 moveDir = (playerPos - boss.transform.position).normalized;
+
+        // Check từng bomb đang tồn tại
+        var bombs = Object.FindObjectsOfType<FallingBomb>();
+        foreach (var bomb in bombs)
+        {
+            float dist = Vector3.Distance(boss.transform.position, bomb.transform.position);
+            if (dist < bomb.explodeRadius + 1f) // 1f = margin tránh
+            {
+                // Né sang hướng vuông góc
+                Vector3 away = (boss.transform.position - bomb.transform.position).normalized;
+                moveDir += away * 1.5f; // cộng vector né
+            }
+        }
+
+        moveDir.Normalize();
+        boss.transform.position += moveDir * boss.moveSpeed * boss.phase2ChaseMultiplier * Time.deltaTime;
+    }
 
     /// <summary>
     /// Boss ăn hết thịt trên map trước khi quay lại loop.

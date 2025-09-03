@@ -24,16 +24,8 @@ public class BossPhase2State : IBossState
         if (boss.hungerBar != null)
             boss.hungerBar.gameObject.SetActive(false);
 
-        // 🔥 Dọn sạch lure còn sót lại của phase 1
-        var lures = GameObject.FindGameObjectsWithTag("Lure");
-        foreach (var lure in lures)
-        {
-            if (lure != null) Object.Destroy(lure);
-        }
-
         routine = boss.StartCoroutine(PhaseRoutine(boss));
     }
-
 
 
     public void Update(Boss boss) { }
@@ -97,7 +89,7 @@ public class BossPhase2State : IBossState
             yield return null;
         }
         if (shootCount > 0)
-            yield return new WaitForSeconds(boss.phase2PreShootDelay);
+            yield return new WaitForSeconds(0.3f);
         // Nếu có bắn → dùng skill bắn của phase 1
         if (shootCount > 0 && playerT != null && boss.phase1BulletPrefab != null)
         {

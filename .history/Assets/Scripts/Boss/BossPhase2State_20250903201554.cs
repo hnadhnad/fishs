@@ -24,16 +24,8 @@ public class BossPhase2State : IBossState
         if (boss.hungerBar != null)
             boss.hungerBar.gameObject.SetActive(false);
 
-        // 🔥 Dọn sạch lure còn sót lại của phase 1
-        var lures = GameObject.FindGameObjectsWithTag("Lure");
-        foreach (var lure in lures)
-        {
-            if (lure != null) Object.Destroy(lure);
-        }
-
         routine = boss.StartCoroutine(PhaseRoutine(boss));
     }
-
 
 
     public void Update(Boss boss) { }
@@ -72,9 +64,13 @@ public class BossPhase2State : IBossState
             }
 
             // 🔁 Pattern loop
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 3); // bắn 3 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 2); // bắn 2 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 1); // bắn 1 viên
+            yield return BombThenShoot(boss, playerT, 0); // thả bomb
             yield return BombThenShoot(boss, playerT, 0); // thả bomb
 
             // ✅ Sau pattern → boss đi ăn thịt (nếu có)
@@ -87,24 +83,16 @@ public class BossPhase2State : IBossState
         Vector3 targetPos = (playerT != null) ? playerT.position : boss.transform.position;
         SpawnBomb(boss, targetPos);
 
-        // ⏸ Chờ interval nhưng hủy nếu boss bị stun
-        float elapsed = 0f;
-        while (elapsed < boss.phase2BombInterval)
-        {
-            if (boss == null || boss.IsStunned)
-                yield break; // ❌ dừng action nếu đang choáng
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        if (shootCount > 0)
-            yield return new WaitForSeconds(boss.phase2PreShootDelay);
+        yield return new WaitForSeconds(boss.phase2BombInterval);
+
         // Nếu có bắn → dùng skill bắn của phase 1
         if (shootCount > 0 && playerT != null && boss.phase1BulletPrefab != null)
         {
             for (int i = 0; i < shootCount; i++)
             {
-                if (playerT == null || boss == null || boss.IsStunned)
-                    yield break; // ❌ hủy luôn nếu boss bị stun trong khi chuẩn bị bắn
+                // ✅ Check lại trước khi dùng transform để tránh lỗi MissingReference
+                if (playerT == null || boss == null)
+                    yield break;
 
                 Vector3 dir = (playerT.position - boss.transform.position).normalized;
                 Vector3 spawnPos = boss.transform.position + dir * boss.phase1BulletSpawnOffset;
@@ -113,19 +101,10 @@ public class BossPhase2State : IBossState
                 if (bullet.TryGetComponent<Rigidbody2D>(out var rb))
                     rb.velocity = dir * boss.phase1BulletSpeed;
 
-                float wait = boss.phase1ShootInterval;
-                float t = 0f;
-                while (t < wait)
-                {
-                    if (boss == null || boss.IsStunned)
-                        yield break; // ❌ nếu đang stun thì dừng bắn
-                    t += Time.deltaTime;
-                    yield return null;
-                }
+                yield return new WaitForSeconds(boss.phase1ShootInterval);
             }
         }
     }
-
 
 
 

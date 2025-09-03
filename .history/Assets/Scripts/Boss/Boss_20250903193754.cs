@@ -114,8 +114,6 @@ public class Boss : MonoBehaviour
     public float phase2BombDelay = 1.5f;         // Thời gian cảnh báo trước khi nổ
     public float phase2BombDamage = 200f;        // Boss mất máu nếu dính bomb
     public float phase2BossStunDuration = 2f;    // Thời gian Boss bị choáng sau khi dính bomb
-    public float phase2PreShootDelay = 0.3f;
-
 
     [Header("Phase2 - Meat drop")]
 [Header("Phase2 - Meat drop")]
@@ -191,14 +189,6 @@ public class Boss : MonoBehaviour
 
         if (healthBar != null) healthBar.value = currentHealth;
         if (hungerBar != null) hungerBar.value = currentHunger;
-
-                // 🔥 Giảm stunTimer theo thời gian
-        if (stunTimer > 0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if (stunTimer < 0f) stunTimer = 0f;
-        }
-
 
         // Update logic của state hiện tại
         currentState?.Update(this);
