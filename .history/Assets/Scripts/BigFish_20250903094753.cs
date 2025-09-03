@@ -24,10 +24,6 @@ public class BigFish : MonoBehaviour
     private float huntTimer = 0f;
     private Transform huntTarget;
 
-    [Header("Spawn Settings")]
-    public float spawnDelay = 2f;  // ⏳ Thời gian chờ sau khi spawn
-    private float spawnTimer = 0f;
-
     [Header("Visual Settings")]
     public float maxTiltAngle = 20f;    
 
@@ -54,21 +50,11 @@ public class BigFish : MonoBehaviour
         waveOffset = Random.value * Mathf.PI * 2f;
 
         baseScaleX = Mathf.Abs(transform.localScale.x);
-
-        spawnTimer = spawnDelay; // khởi tạo bộ đếm
     }
 
     void Update()
     {
         if (player == null || playerFish == null || selfFish == null) return;
-
-        // --- Nếu vẫn còn spawn delay -> chỉ bơi wave ---
-        if (spawnTimer > 0f)
-        {
-            spawnTimer -= Time.deltaTime;
-            SwimWave();
-            return;
-        }
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 

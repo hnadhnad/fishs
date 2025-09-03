@@ -113,7 +113,8 @@ MonoBehaviour:
   maxTiltAngle: 25
   tiltLerpSpeed: 5
   velocity: {x: 0, y: 0}
-  fleeRadius: 7
+  fleeRadius: 4
+  extraFleeTime: 1
 --- !u!50 &7392789859516798649
 Rigidbody2D:
   serializedVersion: 4

@@ -64,26 +64,53 @@ public class SkillDraftUI : MonoBehaviour
             canvasGroup.alpha = 1f;
         }
 
-        // Kiểm tra skill còn khả dụng thì hiện nút, không thì ẩn
-        if (option1Button != null)
+        // 1) Lấy danh sách skill còn khả dụng
+        List<int> availableIds = new List<int>();
+        if (SkillManager.Instance == null)
         {
-            option1Button.onClick.RemoveAllListeners();
-            option1Button.onClick.AddListener(() => InternalChoose(1));
-            option1Button.gameObject.SetActive(SkillManager.Instance.IsSkillAvailable(1));
+            // fallback: cho hiện hết 1..3
+            availableIds.Add(1);
+            availableIds.Add(2);
+            availableIds.Add(3);
+        }
+        else
+        {
+            for (int id = 1; id <= 3; id++)
+            {
+                if (SkillManager.Instance.IsSkillAvailable(id))
+                    availableIds.Add(id);
+            }
         }
 
-        if (option2Button != null)
-        {
-            option2Button.onClick.RemoveAllListeners();
-            option2Button.onClick.AddListener(() => InternalChoose(2));
-            option2Button.gameObject.SetActive(SkillManager.Instance.IsSkillAvailable(2));
-        }
+        // 2) Chọn tối đa optionsToShow skill để hiển thị
+        int showCount = Mathf.Min(optionsToShow, availableIds.Count);
 
-        if (option3Button != null)
+        // 3) Reset và map nút theo danh sách trên
+        runtimeOptionIds.Clear();
+
+        for (int i = 0; i < optionButtons.Count; i++)
         {
-            option3Button.onClick.RemoveAllListeners();
-            option3Button.onClick.AddListener(() => InternalChoose(3));
-            option3Button.gameObject.SetActive(SkillManager.Instance.IsSkillAvailable(3));
+            var btn = optionButtons[i];
+            if (btn == null) continue;
+
+            btn.onClick.RemoveAllListeners();
+
+            if (i < showCount)
+            {
+                int skillId = availableIds[i]; // map skill thực vào nút i
+                runtimeOptionIds.Add(skillId);
+
+                btn.gameObject.SetActive(true);
+                btn.onClick.AddListener(() => InternalChoose(skillId));
+
+                // (tuỳ chọn) cập nhật label nếu bạn có Text/TMP trên nút
+                // var txt = btn.GetComponentInChildren<TMPro.TMP_Text>();
+                // if (txt) txt.text = GetSkillName(skillId);
+            }
+            else
+            {
+                btn.gameObject.SetActive(false);
+            }
         }
 
         if (skipButton != null) skipButton.gameObject.SetActive(true);
@@ -91,7 +118,6 @@ public class SkillDraftUI : MonoBehaviour
         // Dừng game
         Time.timeScale = 0f;
     }
-
 
     public void Hide()
     {

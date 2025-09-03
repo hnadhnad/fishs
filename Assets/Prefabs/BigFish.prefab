@@ -163,6 +163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
+  isAlgae: 0
   scoreValue: 10
   size: 1.5
   eatSound: {fileID: 0}
@@ -182,13 +183,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49e33182a45d84d4b87857bc7698ffff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalSpeed: 2
+  normalSpeed: 1.5
   chargeSpeed: 6
   waveAmplitude: 1
   waveFrequency: 2
-  chaseRadius: 6
+  chaseRadius: 8
   chargeUpTime: 1
   chargeDuration: 2
   fleeRadius: 7
+  extraFleeTime: 1
+  huntChance: 0.5
+  huntDuration: 1
+  spawnDelay: 5
   maxTiltAngle: 20
   direction: -1

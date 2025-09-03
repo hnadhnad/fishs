@@ -104,6 +104,7 @@ MonoBehaviour:
   direction: {x: 1, y: 0}
   initialSize: 0.9
   fleeRadius: 7
+  extraFleeTime: 1
   maxTiltAngle: 20
 --- !u!50 &7280750248094888256
 Rigidbody2D:

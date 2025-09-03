@@ -1,35 +1,38 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Fish))]
-public class MediumFish : MonoBehaviour
+public class FishStraight : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float speed = 2f;
-    public float waveAmplitude = 1f;
-    public float waveFrequency = 2f;
-    public float chaseRadius = 5f;
-    public float fleeRadius = 5f;
+    public Vector2 direction = Vector2.right;
+    public float initialSize = 0.9f;
 
     [Header("Flee Settings")]
-    public float extraFleeTime = 2f; // thời gian chạy thêm sau khi thoát bán kính
+    public float fleeRadius = 5f;       // bán kính phát hiện cá lớn hơn
+    public float extraFleeTime = 2f;    // chạy thêm sau khi thoát bán kính
 
-    [Header("Rotation Settings")]
-    public float maxTiltAngle = 15f; // góc nghiêng tối đa
+    [Header("Visual Settings")]
+    public float maxTiltAngle = 20f;    // góc nghiêng tối đa khi chạy
 
-    [HideInInspector] public int direction = -1;
-
-    private float waveOffset;
     private Fish selfFish;
     private float baseScaleX;
 
     private float fleeTimer = 0f;
-    private Transform fleeTarget; // con cá lớn "đe dọa nhất"
+    private Transform fleeTarget;
 
     void Start()
     {
         selfFish = GetComponent<Fish>();
-        waveOffset = Random.value * Mathf.PI * 2f;
+        if (selfFish != null)
+        {
+            selfFish.SetSize(initialSize);
+        }
+
         baseScaleX = Mathf.Abs(transform.localScale.x);
+
+        // flip ban đầu theo hướng
+        UpdateVisual(direction, tilt: false);
     }
 
     void Update()
@@ -37,7 +40,7 @@ public class MediumFish : MonoBehaviour
         Vector3 moveDir = Vector3.zero;
         bool startedFleeThisFrame = false;
 
-        // 1) Tìm con cá lớn "đe dọa nhất"
+        // --- tìm con cá lớn đe dọa ---
         Fish threatFish = FindThreatFish();
 
         if (threatFish != null)
@@ -52,7 +55,7 @@ public class MediumFish : MonoBehaviour
             }
         }
 
-        // 2) Nếu không bắt đầu flee mới nhưng còn thời gian extraFleeTime → tiếp tục chạy
+        // --- vẫn chạy thêm nếu còn extraFleeTime ---
         if (!startedFleeThisFrame)
         {
             if (fleeTarget != null && fleeTimer > 0f)
@@ -64,36 +67,26 @@ public class MediumFish : MonoBehaviour
             }
             else
             {
-                // 3) Nếu không bị đe dọa → thử chase player
-                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-                if (playerObj != null)
-                {
-                    Fish playerFish = playerObj.GetComponent<Fish>();
-                    if (playerFish != null)
-                    {
-                        float distToPlayer = Vector2.Distance(transform.position, playerObj.transform.position);
-                        if (distToPlayer <= chaseRadius && selfFish != null && selfFish.size > playerFish.size)
-                        {
-                            moveDir = (playerObj.transform.position - transform.position).normalized;
-                        }
-                    }
-                }
+                // --- không bị đe dọa → di chuyển bình thường ---
+                moveDir = direction.normalized;
+                transform.Translate(moveDir * speed * Time.deltaTime);
+                UpdateVisual(moveDir, tilt: false);
 
-                // 4) Nếu vẫn không có hướng → wave patrol
-                if (moveDir == Vector3.zero)
-                {
-                    float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
-                    moveDir = new Vector3(direction, waveY, 0f).normalized;
-                }
+                if (!IsVisible())
+                    Destroy(gameObject);
+                return;
             }
         }
 
-        // Di chuyển
-        transform.position += moveDir * speed * Time.deltaTime;
-        UpdateVisual(moveDir);
+        // --- di chuyển khi bỏ chạy ---
+        transform.Translate(moveDir * speed * 1.5f * Time.deltaTime);
+        UpdateVisual(moveDir, tilt: true);
+
+        if (!IsVisible())
+            Destroy(gameObject);
     }
 
-    // --- Tìm cá lớn trong bán kính, chọn con xa nhất để chạy hướng an toàn ---
+    // Tìm cá lớn hơn trong bán kính, nếu có nhiều thì chọn con xa nhất để hướng chạy ổn định
     Fish FindThreatFish()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, fleeRadius);
@@ -124,22 +117,35 @@ public class MediumFish : MonoBehaviour
             }
         }
 
-        // Nếu có nhiều con lớn → ưu tiên chạy tránh con xa nhất (tránh đổi hướng liên tục)
         return farthest != null ? farthest : nearest;
     }
 
-    void UpdateVisual(Vector3 moveDir)
+    void UpdateVisual(Vector2 moveDir, bool tilt = true)
     {
         if (Mathf.Abs(moveDir.x) < 0.001f) return;
 
         float signX = Mathf.Sign(moveDir.x);
+
         transform.localScale = new Vector3(signX * baseScaleX,
                                            transform.localScale.y,
                                            transform.localScale.z);
 
-        float tilt = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
-        tilt *= signX;
+        if (tilt)
+        {
+            float tiltAngle = Mathf.Clamp(moveDir.y * maxTiltAngle, -maxTiltAngle, maxTiltAngle);
+            tiltAngle *= signX;
+            transform.localRotation = Quaternion.Euler(0f, 0f, tiltAngle);
+        }
+        else
+        {
+            transform.localRotation = Quaternion.identity;
+        }
+    }
 
-        transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
+    bool IsVisible()
+    {
+        if (Camera.main == null) return true;
+        Vector3 viewPos = Camera.main.WorldToViewportPoint(transform.position);
+        return (viewPos.x > -0.1f && viewPos.x < 1.1f && viewPos.y > -0.1f && viewPos.y < 1.1f);
     }
 }

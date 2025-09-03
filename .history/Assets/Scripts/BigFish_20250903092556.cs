@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Fish))]
 public class BigFish : MonoBehaviour
@@ -19,14 +20,10 @@ public class BigFish : MonoBehaviour
     public float extraFleeTime = 2f;     
 
     [Header("Hunt Other Fish")]
-    [Range(0f, 1f)] public float huntChance = 0.3f; 
-    public float huntDuration = 3f;   
+    [Range(0f, 1f)] public float huntChance = 0.3f; // tần suất săn cá thường
+    public float huntCheckInterval = 3f;           // chu kỳ kiểm tra săn cá
     private float huntTimer = 0f;
     private Transform huntTarget;
-
-    [Header("Spawn Settings")]
-    public float spawnDelay = 2f;  // ⏳ Thời gian chờ sau khi spawn
-    private float spawnTimer = 0f;
 
     [Header("Visual Settings")]
     public float maxTiltAngle = 20f;    
@@ -54,21 +51,11 @@ public class BigFish : MonoBehaviour
         waveOffset = Random.value * Mathf.PI * 2f;
 
         baseScaleX = Mathf.Abs(transform.localScale.x);
-
-        spawnTimer = spawnDelay; // khởi tạo bộ đếm
     }
 
     void Update()
     {
         if (player == null || playerFish == null || selfFish == null) return;
-
-        // --- Nếu vẫn còn spawn delay -> chỉ bơi wave ---
-        if (spawnTimer > 0f)
-        {
-            spawnTimer -= Time.deltaTime;
-            SwimWave();
-            return;
-        }
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
@@ -101,53 +88,64 @@ public class BigFish : MonoBehaviour
             return;
         }
 
-        // --- Nếu đang săn cá thường ---
+        // --- Nếu không dash -> thỉnh thoảng săn cá thường ---
+        HuntOtherFish();
+
         if (huntTarget != null)
         {
-            huntTimer -= Time.deltaTime;
+            Vector3 dir = (huntTarget.position - transform.position).normalized;
+            transform.position += dir * normalSpeed * Time.deltaTime;
+            UpdateVisual(dir);
 
-            if (huntTimer > 0f && huntTarget != null)
+            // nếu cá mục tiêu bị ăn hoặc ra khỏi phạm vi thì bỏ
+            if (huntTarget == null || Vector2.Distance(transform.position, huntTarget.position) > chaseRadius)
             {
-                Vector3 dir = (huntTarget.position - transform.position).normalized;
-                transform.position += dir * normalSpeed * Time.deltaTime;
-                UpdateVisual(dir);
-                return;
+                huntTarget = null;
             }
-            else
-            {
-                huntTarget = null; // hết thời gian thì bỏ
-            }
+            return;
         }
 
-        // --- Nếu chưa có hunt target -> thử tìm cá ---
-        TryFindHuntTarget();
-
-        // --- Wave khi không làm gì đặc biệt ---
+        // --- Nếu không có gì đặc biệt -> wave bình thường ---
         SwimWave();
     }
 
-    void TryFindHuntTarget()
+    void HuntOtherFish()
     {
-        if (huntTarget != null) return;
-
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, chaseRadius);
-        foreach (var hit in hits)
+        huntTimer -= Time.deltaTime;
+        if (huntTimer <= 0f)
         {
-            Fish f = hit.GetComponent<Fish>();
-            if (f == null || f == selfFish) continue;
+            huntTimer = huntCheckInterval;
 
-            if (f.isAlgae) continue; // bỏ qua tảo
-
-            if (f.size < selfFish.size)
+            if (Random.value < huntChance)
             {
-                if (Random.value < huntChance)
+                Fish target = FindRandomSmallerFish();
+                if (target != null)
                 {
-                    huntTarget = f.transform;
-                    huntTimer = huntDuration;
-                    break;
+                    huntTarget = target.transform;
                 }
             }
         }
+    }
+
+    Fish FindRandomSmallerFish()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, chaseRadius);
+        List<Fish> candidates = new List<Fish>();
+
+        foreach (var hit in hits)
+        {
+            Fish f = hit.GetComponent<Fish>();
+            if (f == null || f == selfFish || f == playerFish) continue;
+            if (f.size < selfFish.size) candidates.Add(f);
+        }
+
+        if (candidates.Count > 0)
+        {
+            int idx = Random.Range(0, candidates.Count);
+            return candidates[idx];
+        }
+
+        return null;
     }
 
     void SwimWave()
@@ -161,7 +159,7 @@ public class BigFish : MonoBehaviour
     void StartCharge(Vector3 targetPos)
     {
         charging = true;
-        chargeTimer = -chargeUpTime;
+        chargeTimer = -chargeUpTime; // chargeUp trước khi lao
         chargeDir = (targetPos - transform.position).normalized;
     }
 
@@ -169,7 +167,7 @@ public class BigFish : MonoBehaviour
     {
         if (chargeTimer < 0f)
         {
-            chargeTimer += Time.deltaTime;
+            chargeTimer += Time.deltaTime; // charge up
         }
         else if (chargeTimer < chargeDuration)
         {
@@ -179,7 +177,7 @@ public class BigFish : MonoBehaviour
         }
         else
         {
-            charging = false;
+            charging = false; // kết thúc dash
         }
     }
 
@@ -197,14 +195,5 @@ public class BigFish : MonoBehaviour
         tilt *= signX;
 
         transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, chaseRadius);
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, fleeRadius);
     }
 }

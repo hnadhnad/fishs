@@ -1,17 +1,20 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Fish))]
-public class FishWave : MonoBehaviour
+public class MediumFish : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float speed = 2f;
     public float waveAmplitude = 1f;
     public float waveFrequency = 2f;
-    public float fleeRadius = 5f;   // bán kính bỏ chạy
+    public float chaseRadius = 5f;
+    public float fleeRadius = 5f;
+
+    [Header("Flee Settings")]
     public float extraFleeTime = 2f; // thời gian chạy thêm sau khi thoát bán kính
 
-    [Header("Visual Settings")]
-    public float maxTiltAngle = 20f; // góc nghiêng tối đa
+    [Header("Rotation Settings")]
+    public float maxTiltAngle = 15f; // góc nghiêng tối đa
 
     [HideInInspector] public int direction = -1;
 
@@ -20,81 +23,89 @@ public class FishWave : MonoBehaviour
     private float baseScaleX;
 
     private float fleeTimer = 0f;
-    private Transform fleeTarget;
+    private Transform fleeTarget; // con cá lớn gần nhất
 
     void Start()
     {
         selfFish = GetComponent<Fish>();
         waveOffset = Random.value * Mathf.PI * 2f;
-
         baseScaleX = Mathf.Abs(transform.localScale.x);
-
-        // flip sprite ban đầu theo direction
-        UpdateVisual(new Vector3(direction, 0, 0));
     }
 
     void Update()
     {
-        Vector3 moveDir = Vector3.zero;
-        bool startedFleeThisFrame = false;
-
-        // 1) Tìm cá lớn hơn gần nhất
         Fish biggerFish = FindNearestBiggerFish();
+        Vector3 moveDir = Vector3.zero;
 
         if (biggerFish != null)
         {
-            float dist = Vector2.Distance(transform.position, biggerFish.transform.position);
-            if (dist <= fleeRadius)
+            float distance = Vector2.Distance(transform.position, biggerFish.transform.position);
+
+            if (distance <= fleeRadius)
             {
+                // bắt đầu chạy
                 fleeTarget = biggerFish.transform;
                 fleeTimer = extraFleeTime;
                 moveDir = (transform.position - fleeTarget.position).normalized;
-                startedFleeThisFrame = true;
             }
-        }
-
-        // 2) Nếu không bắt đầu flee mới nhưng còn thời gian flee → chạy tiếp
-        if (!startedFleeThisFrame)
-        {
-            if (fleeTarget != null && fleeTimer > 0f)
+            else if (fleeTarget != null && fleeTimer > 0f)
             {
+                // vẫn chạy thêm dù cá lớn đã đi xa
                 moveDir = (transform.position - fleeTarget.position).normalized;
                 fleeTimer -= Time.deltaTime;
-
-                if (fleeTarget == null) fleeTimer = 0f; // target bị destroy
             }
-            else
+        }
+        else if (fleeTarget != null && fleeTimer > 0f)
+        {
+            // vẫn chạy thêm nếu không tìm thấy cá lớn nữa
+            moveDir = (transform.position - fleeTarget.position).normalized;
+            fleeTimer -= Time.deltaTime;
+        }
+        else if (biggerFish == null)
+        {
+            // không bị đe dọa → kiểm tra chase player
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
             {
-                // 3) Bình thường thì bơi sóng
+                Fish playerFish = playerObj.GetComponent<Fish>();
+                float distance = Vector2.Distance(transform.position, playerObj.transform.position);
+
+                if (distance <= chaseRadius && selfFish.size > playerFish.size)
+                {
+                    moveDir = (playerObj.transform.position - transform.position).normalized;
+                }
+            }
+
+            // nếu không chase → di chuyển wave
+            if (moveDir == Vector3.zero)
+            {
                 float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
                 moveDir = new Vector3(direction, waveY, 0f).normalized;
             }
         }
 
-        // Di chuyển
+        // di chuyển
         transform.position += moveDir * speed * Time.deltaTime;
 
-        // Cập nhật hiển thị
+        // cập nhật flip và tilt
         UpdateVisual(moveDir);
     }
 
-    // Tìm cá lớn hơn gần nhất trong bán kính
     Fish FindNearestBiggerFish()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, fleeRadius);
+        Fish[] allFish = FindObjectsOfType<Fish>();
         Fish nearest = null;
         float minDist = Mathf.Infinity;
 
-        foreach (var hit in hits)
+        foreach (var f in allFish)
         {
-            Fish f = hit.GetComponent<Fish>();
-            if (f == null || f == selfFish) continue;
-            if (f.size <= selfFish.size) continue;
+            if (f == selfFish) continue; // bỏ qua bản thân
+            if (f.size <= selfFish.size) continue; // chỉ quan tâm cá lớn hơn
 
-            float d = Vector2.Distance(transform.position, f.transform.position);
-            if (d < minDist)
+            float dist = Vector2.Distance(transform.position, f.transform.position);
+            if (dist < minDist)
             {
-                minDist = d;
+                minDist = dist;
                 nearest = f;
             }
         }
@@ -107,7 +118,6 @@ public class FishWave : MonoBehaviour
         if (Mathf.Abs(moveDir.x) < 0.001f) return;
 
         float signX = Mathf.Sign(moveDir.x);
-
         transform.localScale = new Vector3(signX * baseScaleX,
                                            transform.localScale.y,
                                            transform.localScale.z);

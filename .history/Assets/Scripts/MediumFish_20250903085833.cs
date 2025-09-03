@@ -23,7 +23,7 @@ public class MediumFish : MonoBehaviour
     private float baseScaleX;
 
     private float fleeTimer = 0f;
-    private Transform fleeTarget; // con cá lớn "đe dọa nhất"
+    private Transform fleeTarget; // con cá lớn gần nhất từng gây flee
 
     void Start()
     {
@@ -35,36 +35,40 @@ public class MediumFish : MonoBehaviour
     void Update()
     {
         Vector3 moveDir = Vector3.zero;
+
+        // 1) tìm con cá lớn gần nhất (nếu có)
+        Fish biggerFish = FindNearestBiggerFish();
+
         bool startedFleeThisFrame = false;
 
-        // 1) Tìm con cá lớn "đe dọa nhất"
-        Fish threatFish = FindThreatFish();
-
-        if (threatFish != null)
+        // 2) Nếu có con cá lớn gần đó và trong bán kính flee -> bắt đầu chạy
+        if (biggerFish != null)
         {
-            float dist = Vector2.Distance(transform.position, threatFish.transform.position);
-            if (dist <= fleeRadius)
+            float distToBigger = Vector2.Distance(transform.position, biggerFish.transform.position);
+            if (distToBigger <= fleeRadius)
             {
-                fleeTarget = threatFish.transform;
-                fleeTimer = extraFleeTime;
-                moveDir = (transform.position - threatFish.transform.position).normalized;
+                fleeTarget = biggerFish.transform;
+                fleeTimer = extraFleeTime;        // reset thời gian chạy thêm
+                moveDir = (transform.position - fleeTarget.position).normalized;
                 startedFleeThisFrame = true;
             }
         }
 
-        // 2) Nếu không bắt đầu flee mới nhưng còn thời gian extraFleeTime → tiếp tục chạy
+        // 3) Nếu không bắt đầu flee mới, nhưng đang trong thời gian fleeTimer thì vẫn chạy tiếp
         if (!startedFleeThisFrame)
         {
             if (fleeTarget != null && fleeTimer > 0f)
             {
+                // vẫn chạy tiếp về hướng rời khỏi fleeTarget
                 moveDir = (transform.position - fleeTarget.position).normalized;
                 fleeTimer -= Time.deltaTime;
 
+                // optional: nếu fleeTarget bị destroy thì clear
                 if (fleeTarget == null) fleeTimer = 0f;
             }
             else
             {
-                // 3) Nếu không bị đe dọa → thử chase player
+                // 4) Không bị đe doạ → check chase player rồi wave
                 GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
                 if (playerObj != null)
                 {
@@ -79,7 +83,7 @@ public class MediumFish : MonoBehaviour
                     }
                 }
 
-                // 4) Nếu vẫn không có hướng → wave patrol
+                // 5) Nếu vẫn không có hướng di chuyển → wave patrol
                 if (moveDir == Vector3.zero)
                 {
                     float waveY = Mathf.Sin(Time.time * waveFrequency + waveOffset) * waveAmplitude;
@@ -88,20 +92,19 @@ public class MediumFish : MonoBehaviour
             }
         }
 
-        // Di chuyển
+        // Di chuyển và cập nhật hình
         transform.position += moveDir * speed * Time.deltaTime;
         UpdateVisual(moveDir);
     }
 
-    // --- Tìm cá lớn trong bán kính, chọn con xa nhất để chạy hướng an toàn ---
-    Fish FindThreatFish()
+    // Tìm cá lớn nhất gần nhất (trả về Fish hoặc null)
+    Fish FindNearestBiggerFish()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, fleeRadius);
-        Fish nearest = null;
-        Fish farthest = null;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, fleeRadius * 2f); 
+        // *2f để có dư một chút, bạn muốn chặt thì để đúng fleeRadius cũng được
 
+        Fish nearest = null;
         float minDist = Mathf.Infinity;
-        float maxDist = 0f;
 
         foreach (var hit in hits)
         {
@@ -110,23 +113,16 @@ public class MediumFish : MonoBehaviour
             if (f.size <= selfFish.size) continue;
 
             float d = Vector2.Distance(transform.position, f.transform.position);
-
             if (d < minDist)
             {
                 minDist = d;
                 nearest = f;
             }
-
-            if (d > maxDist)
-            {
-                maxDist = d;
-                farthest = f;
-            }
         }
 
-        // Nếu có nhiều con lớn → ưu tiên chạy tránh con xa nhất (tránh đổi hướng liên tục)
-        return farthest != null ? farthest : nearest;
+        return nearest;
     }
+
 
     void UpdateVisual(Vector3 moveDir)
     {

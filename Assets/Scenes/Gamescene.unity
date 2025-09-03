@@ -436,7 +436,7 @@ Camera:
   far clip plane: 1000
   field of view: 1
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 11
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -1298,7 +1298,7 @@ MonoBehaviour:
   m_Follow: {fileID: 1759270717}
   m_Lens:
     FieldOfView: 1
-    OrthographicSize: 10
+    OrthographicSize: 11
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -2019,63 +2019,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920995813}
   m_CullTransparentMesh: 1
---- !u!1001 &1015055067
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -7.717213
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -2.6290817
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1580102327271382416, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5037481844905245412, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
-      propertyPath: m_Name
-      value: Boss
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
 --- !u!1 &1344986426
 GameObject:
   m_ObjectHideFlags: 0
@@ -2303,8 +2246,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b4c34987050037459c66a7fd3a875b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bottomLeft: {x: -18, y: -7}
-  topRight: {x: 18, y: 7}
+  backgroundSprite: {fileID: 21300000, guid: 1cefdc672d483364fb1f498d9bcde660, type: 3}
+  mapScale: 9
+  bottomLeft: {x: 0, y: 0}
+  topRight: {x: 0, y: 0}
 --- !u!4 &1551523693
 Transform:
   m_ObjectHideFlags: 0
@@ -2740,6 +2685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 1
+  isAlgae: 0
   scoreValue: 10
   size: 1
   eatSound: {fileID: 0}
@@ -3092,4 +3038,3 @@ SceneRoots:
   - {fileID: 804109469}
   - {fileID: 676778631}
   - {fileID: 723887129}
-  - {fileID: 1015055067}

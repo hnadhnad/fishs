@@ -30,10 +30,6 @@ public class MapManager : MonoBehaviour
         SpriteRenderer sr = bg.AddComponent<SpriteRenderer>();
         sr.sprite = backgroundSprite;
 
-        // ✅ đảm bảo luôn nằm dưới cá
-        sr.sortingLayerName = "Default"; // hoặc "Background" nếu bạn tạo riêng
-        sr.sortingOrder = -100;
-
         // scale theo mapScale
         bg.transform.localScale = Vector3.one * mapScale;
 

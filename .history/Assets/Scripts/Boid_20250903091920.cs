@@ -31,7 +31,7 @@ public class Boid : MonoBehaviour
 
     [Header("Flee Settings")]
     public float fleeRadius = 5f;
-    public float extraFleeTime = 2f;
+    public float extraFleeTime = 2f; // chạy thêm sau khi thoát bán kính
 
     private Fish selfFish;
     private float baseScaleX;
@@ -66,23 +66,12 @@ public class Boid : MonoBehaviour
         float oscillation = osc * speedOscillationAmplitude;
         speed = Mathf.Clamp(baseSpeed + oscillation, minSpeed, maxSpeed);
 
+        // --- logic bỏ chạy ---
         Vector2 moveDir = Vector2.zero;
+        bool startedFleeThisFrame = false;
 
-        // --- Nếu đang có target cũ và chưa hết fleeTimer -> tiếp tục chạy ---
-        if (fleeTarget != null && fleeTimer > 0f)
-        {
-            moveDir = ((Vector2)transform.position - (Vector2)fleeTarget.position).normalized;
-            velocity = moveDir * speed * 1.5f;
-            transform.position += (Vector3)(velocity * Time.deltaTime);
-            fleeTimer -= Time.deltaTime;
-
-            if (fleeTarget == null) fleeTimer = 0f;
-            UpdateVisual(velocity);
-            return;
-        }
-
-        // --- Nếu không còn flee target -> tìm con cá lớn mới ---
         Fish biggerFish = FindNearestBiggerFish();
+
         if (biggerFish != null)
         {
             float dist = Vector2.Distance(transform.position, biggerFish.transform.position);
@@ -90,7 +79,6 @@ public class Boid : MonoBehaviour
             {
                 fleeTarget = biggerFish.transform;
                 fleeTimer = extraFleeTime;
-
                 moveDir = ((Vector2)transform.position - (Vector2)fleeTarget.position).normalized;
                 velocity = moveDir * speed * 1.5f;
                 transform.position += (Vector3)(velocity * Time.deltaTime);
@@ -99,7 +87,23 @@ public class Boid : MonoBehaviour
             }
         }
 
-        // --- boid logic bình thường ---
+        // Nếu không có target mới nhưng còn fleeTimer → chạy tiếp
+        if (!startedFleeThisFrame)
+        {
+            if (fleeTarget != null && fleeTimer > 0f)
+            {
+                moveDir = ((Vector2)transform.position - (Vector2)fleeTarget.position).normalized;
+                velocity = moveDir * speed * 1.5f;
+                transform.position += (Vector3)(velocity * Time.deltaTime);
+                fleeTimer -= Time.deltaTime;
+
+                if (fleeTarget == null) fleeTimer = 0f;
+                UpdateVisual(velocity);
+                return;
+            }
+        }
+
+        // --- logic boid bình thường ---
         List<Boid> neighbors = GetNeighbors();
 
         Vector2 alignment = Vector2.zero;
