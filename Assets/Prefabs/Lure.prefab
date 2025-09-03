@@ -195,6 +195,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bd6a1cc9dfe154684db476aa80c71a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  speed: 4.5
   moveDirection: {x: 1, y: 0}
   maxTiltAngle: 15

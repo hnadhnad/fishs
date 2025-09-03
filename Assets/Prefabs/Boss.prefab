@@ -112,11 +112,11 @@ MonoBehaviour:
   fish: {fileID: 0}
   animator: {fileID: 0}
   moveSpeed: 6
-  chaseLureSpeed: 6
+  chaseLureSpeed: 5
   phase1DashCount: 3
-  phase1DashDistance: 1
-  phase1DashDuration: 0.25
-  phase1DashInterval: 0.5
+  phase1DashDistance: 10
+  phase1DashDuration: 0.75
+  phase1DashInterval: 1
   phase1DashImpactPause: 0.12
   phase1BulletPrefab: {fileID: 1547457209301159574, guid: a6a246ab37bd18a4fb9ee432871b8293, type: 3}
   phase1ShootCount: 3
@@ -125,13 +125,10 @@ MonoBehaviour:
   phase1BulletSpeed: 4
   phase1CyclePause: 0.4
   phase1RetreatHungerFraction: 0.5
-  phase1ExitOffset: 2
   phase1ExitDistance: 6
-  phase1OutsideWait: 1
   phase1LurePrefab: {fileID: 4208229999376911092, guid: d93e24c9044952e44a3552dc1b07ec91, type: 3}
-  phase1LureSpeed: 3
-  phase1LureSpawnForward: 3
-  phase1LureClaimTime: 3
+  phase1LureSpeed: 4.8
+  phase1LureSpawnForward: 4
   phase1LureHealAmount: 150
   phase1PostLureDashCount: 2
   phase1PostLureShootCount: 5
