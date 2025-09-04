@@ -170,12 +170,6 @@ public class BossPhase3State : IBossState
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
             spawnedBombs.Add(b);
 
-            // ✅ Gán radius cho Phase3Bomb ngay sau khi spawn
-            if (b.TryGetComponent<Phase3Bomb>(out var bombComp))
-            {
-                bombComp.bombRadius = boss.phase3BombRadius;
-            }
-
             // start movement coroutine to move this bomb into one target (map target index: i)
             int targetIndex = i;
             boss.StartCoroutine(MoveBombTo(b, circleTargets[targetIndex], boss.phase3BombMoveDuration));

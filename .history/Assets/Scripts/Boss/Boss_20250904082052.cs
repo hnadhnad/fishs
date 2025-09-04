@@ -135,7 +135,6 @@ public class Boss : MonoBehaviour
     [Header("Phase3 - Circle Bombs")]
     public GameObject phase3BombPrefab;       // prefab bomb dùng để tạo 'tường' vòng
     public int phase3BombCount = 12;          // tổng số bomb tạo vòng
-    public float phase3BombRadius = 1.5f;    // kích thước từng bomb (sprite + collider)
     public float phase3CircleRadius = 3f;     // bán kính vòng tròn bomb
     public float phase3BombMoveDuration = 1.2f; // thời gian bomb di chuyển từ ngoại vi vào vị trí vòng
     public float phase3BombSpawnOffscreen = 2.5f; // offset spawn ngoài map (bao xa ngoài edge)

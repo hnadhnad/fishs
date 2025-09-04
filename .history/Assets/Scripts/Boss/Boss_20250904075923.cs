@@ -24,7 +24,7 @@ public class Boss : MonoBehaviour
     [HideInInspector] public Fish fish;
     [HideInInspector] public Animator animator;
 
-    public IBossState currentState;
+    private IBossState currentState;
 
     [Header("Boss Movement")]
     [Tooltip("Tốc độ di chuyển bình thường (retreat, reentry, v.v.)")]
@@ -130,28 +130,6 @@ public class Boss : MonoBehaviour
     public bool IsStunned => stunTimer > 0f;
 
     private bool isInvulnerable = false;
-
-    // ================= PHASE 3 =================
-    [Header("Phase3 - Circle Bombs")]
-    public GameObject phase3BombPrefab;       // prefab bomb dùng để tạo 'tường' vòng
-    public int phase3BombCount = 12;          // tổng số bomb tạo vòng
-    public float phase3BombRadius = 1.5f;    // kích thước từng bomb (sprite + collider)
-    public float phase3CircleRadius = 3f;     // bán kính vòng tròn bomb
-    public float phase3BombMoveDuration = 1.2f; // thời gian bomb di chuyển từ ngoại vi vào vị trí vòng
-    public float phase3BombSpawnOffscreen = 2.5f; // offset spawn ngoài map (bao xa ngoài edge)
-    public float phase3ColumnHeight = 6f;     // chiều cao cột spawn để trải dọc
-
-    [Header("Phase3 - Boss Dash (riêng)")]
-    public float phase3DashDistance = 6f;
-    public float phase3DashDuration = 0.25f;
-    public float phase3DashInterval = 0.25f;
-    public float phase3BombCollisionThreshold = 0.6f; // khoảng cách coi là "đâm trúng" bomb
-    public float phase3BombStunDuration = 2.0f; // boss bị choáng khi đâm trúng
-    public float phase3BombHitDamage = 200f;    // lượng máu boss mất khi đâm trúng (để quy ra meat)
-    public int phase3MeatCount = 4;             // số miếng thịt spawn khi boss đâm trúng
-    public float phase3MeatSpawnOffset = 0.8f;  // khoảng cách spawn miếng thịt quanh boss (bên trong vòng)
-    public float phase3RestAfterMeat = 1.0f;    // thời gian boss nghỉ sau ăn hết thịt
-
 
 
 

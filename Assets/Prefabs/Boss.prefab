@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 69
+  currentHealth: 49
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -141,11 +141,27 @@ MonoBehaviour:
   phase2BombDelay: 2
   phase2BombDamage: 10
   phase2BossStunDuration: 4
+  phase2PreShootDelay: 0.3
   meatPrefab: {fileID: 4904525448659230853, guid: 0e834323c8c52ca4e80d24fa29be7766, type: 3}
   phase2MeatCount: 4
   phase2MeatSpawnOffset: 5
   phase2MeatScatterSpeed: 3
   phase2EatMeatSpeed: 4
+  phase3BombPrefab: {fileID: 7037461479726244995, guid: 49d70ec6c62b8b64fa93356ce7d830d4, type: 3}
+  phase3BombCount: 12
+  phase3CircleRadius: 4
+  phase3BombMoveDuration: 1.2
+  phase3BombSpawnOffscreen: 2.5
+  phase3ColumnHeight: 6
+  phase3DashDistance: 6
+  phase3DashDuration: 0.25
+  phase3DashInterval: 0.25
+  phase3BombCollisionThreshold: 0.6
+  phase3BombStunDuration: 2
+  phase3BombHitDamage: 200
+  phase3MeatCount: 4
+  phase3MeatSpawnOffset: 0.8
+  phase3RestAfterMeat: 1
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4
