@@ -232,23 +232,21 @@ public class Boss : MonoBehaviour
 
     void HandlePhaseLogic()
     {
-        if (currentHealth <= maxHealth * 0.2f)
+        // Ưu tiên máu thấp hơn trước
+        if (currentHealth <= maxHealth * 0.2f && !(currentState is BossEnragedState))
         {
-            if (!(currentState is BossEnragedState))
-                ChangeState(new BossEnragedState());
+            ChangeState(new BossEnragedState());
         }
-        else if (currentHealth <= maxHealth * 0.5f)
+        else if (currentHealth <= maxHealth * 0.5f && !(currentState is BossPhase3State))
         {
-            if (!(currentState is BossPhase3State))
-                ChangeState(new BossPhase3State());
+            ChangeState(new BossPhase3State());
         }
-        else if (currentHealth <= maxHealth * 0.7f)
+        else if (currentHealth <= maxHealth * 0.7f && !(currentState is BossPhase2State))
         {
-            if (!(currentState is BossPhase2State))
-                ChangeState(new BossPhase2State());
+            ChangeState(new BossPhase2State());
         }
-    }
 
+    }
 
     public void ChangeState(IBossState newState)
     {

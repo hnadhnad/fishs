@@ -130,13 +130,16 @@ public class BossPhase3State : IBossState
     }
 
     // Spawns bombs at two vertical columns (left/right) then moves them to circle positions.
+// Spawns bombs at two vertical columns (left/right) then moves them to circle positions.
     private void SpawnAndArrangeBombs(Boss boss, Vector3 center)
     {
-        // clear any old bombs list (just in memory)
         spawnedBombs.Clear();
 
-        int total = Mathf.Max(4, boss.phase3BombCount); // minimal protection
-        // compute circle target positions
+        int total = Mathf.Max(4, boss.phase3BombCount);
+        int leftCount = total / 2;
+        int rightCount = total - leftCount;
+
+        // Tính toán vị trí vòng tròn (mục tiêu cuối cùng cho mỗi bomb)
         Vector3[] circleTargets = new Vector3[total];
         float stepDeg = 360f / total;
         for (int i = 0; i < total; i++)
@@ -146,41 +149,53 @@ public class BossPhase3State : IBossState
             circleTargets[i] = center + dir * boss.phase3CircleRadius;
         }
 
-        // spawn columns: left and right — distribute targets: half from left, half from right
-        int half = total / 2;
-        float mapHalfHeight = (Object.FindObjectOfType<MapManager>().MapSize.y) / 2f;
-        float columnSpacingY = Mathf.Min(mapHalfHeight * 0.9f, boss.phase3ColumnHeight); // clamp
-
-        // left column spawn x
         var map = Object.FindObjectOfType<MapManager>();
+        if (map == null) return;
+
         float leftX = map.bottomLeft.x - boss.phase3BombSpawnOffscreen;
         float rightX = map.topRight.x + boss.phase3BombSpawnOffscreen;
 
-        // spawn positions for left column (top->bottom)
-        for (int i = 0; i < total; i++)
-        {
-            // choose spawn side: first half from left, rest from right
-            bool fromLeft = (i < half);
-            float spawnX = fromLeft ? leftX : rightX;
-            // spread vertically
-            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, (float)(fromLeft ? i : (i - half)) / Mathf.Max(1, half - 1));
-            Vector3 spawnPos = new Vector3(spawnX, y, center.z);
+        float mapHalfHeight = map.MapSize.y / 2f;
+        float columnSpacingY = Mathf.Min(mapHalfHeight * 0.9f, boss.phase3ColumnHeight);
 
-            // instantiate bomb prefab (must be configured as "wall" bomb)
+        // --- Spawn nửa đầu (bên trái) ---
+        for (int i = 0; i < leftCount; i++)
+        {
+            // t là giá trị 0..1 cho việc nội suy Y theo index trong cột trái
+            float t = (leftCount > 1) ? (float)i / (leftCount - 1) : 0.5f;
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, t);
+            Vector3 spawnPos = new Vector3(leftX, y, center.z);
+
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
             spawnedBombs.Add(b);
 
-            // ✅ Gán radius cho Phase3Bomb ngay sau khi spawn
             if (b.TryGetComponent<Phase3Bomb>(out var bombComp))
-            {
                 bombComp.bombRadius = boss.phase3BombRadius;
-            }
 
-            // start movement coroutine to move this bomb into one target (map target index: i)
-            int targetIndex = i;
+            int targetIndex = i; // left maps to first half of circle targets
+            boss.StartCoroutine(MoveBombTo(b, circleTargets[targetIndex], boss.phase3BombMoveDuration));
+        }
+
+        // --- Spawn nửa sau (bên phải) ---
+        for (int i = 0; i < rightCount; i++)
+        {
+            // t là 0..1 cho cột phải (độc lập với leftCount)
+            float t = (rightCount > 1) ? (float)i / (rightCount - 1) : 0.5f;
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, t);
+            Vector3 spawnPos = new Vector3(rightX, y, center.z);
+
+            int targetIndex = i + leftCount; // right maps to latter half of circle targets
+            GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
+            spawnedBombs.Add(b);
+
+            if (b.TryGetComponent<Phase3Bomb>(out var bombComp))
+                bombComp.bombRadius = boss.phase3BombRadius;
+
             boss.StartCoroutine(MoveBombTo(b, circleTargets[targetIndex], boss.phase3BombMoveDuration));
         }
     }
+
+
 
     private IEnumerator MoveBombTo(GameObject bomb, Vector3 target, float duration)
     {

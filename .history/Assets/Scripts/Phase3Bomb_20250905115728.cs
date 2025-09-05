@@ -19,30 +19,23 @@ public class Phase3Bomb : MonoBehaviour
     {
         bombRadius = r;
 
-        // lấy sprite gốc
+        // scale sprite (transform) để khớp bán kính mong muốn
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null && sr.sprite != null)
+        if (sr != null && sr.bounds.size.x > 0.01f)
         {
-            // chiều rộng sprite ở đơn vị world
-            float spriteWorldSize = sr.sprite.bounds.size.x;
-            
-            // cần scale sao cho bán kính thật = bombRadius
-            float targetDiameter = bombRadius * 2f;
-            float scale = targetDiameter / spriteWorldSize;
-
+            float spriteSize = sr.bounds.size.x;
+            float scale = (bombRadius * 2f) / spriteSize;
             transform.localScale = new Vector3(scale, scale, 1f);
         }
 
+        // KHÔNG set lại circle.radius, để = 0.5 (mặc định unit circle) × localScale
         var circle = GetComponent<CircleCollider2D>();
         if (circle != null)
         {
             circle.isTrigger = false;
-
-            // để radius mặc định = 0.5 (unit circle), không set = bombRadius nữa
-            circle.radius = 0.5f; 
+            // circle.radius = bombRadius; ❌ bỏ dòng này
         }
     }
-
 
 
     private void HandleHit(GameObject other)
