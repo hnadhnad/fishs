@@ -43,49 +43,43 @@ public class Phase3Bomb : MonoBehaviour
         }
     }
 
+
+
     private void HandleHit(GameObject other)
     {
-        // NOTE: không return sớm bằng 'consumed' để bomb luôn tồn tại và xử lý mọi va chạm
+        if (consumed) return;
+
         var fish = other.GetComponentInParent<Fish>();
         if (fish != null)
         {
-            // Player chết ngay
             if (fish.isPlayer)
             {
-                Debug.Log($"[Phase3Bomb] Player hit by bomb ({name}) -> Die()");
+                Debug.Log("Bomb: Player die!");
                 fish.Die();
-                return; // xong, bomb vẫn tồn tại
+                consumed = true;
             }
-
-            // Thử detect Boss trực tiếp (không dựa vào fish.isBoss flag)
-            var boss = other.GetComponentInParent<Boss>();
-            if (boss != null)
+            else if (fish.isBoss)
             {
-                // Nếu boss đang stun/invulnerable thì bỏ qua (boss đã có cơ chế isInvulnerable)
-                if (boss.IsStunned)
+                Debug.Log("Bomb: Boss va chạm → stun + spawn thịt");
+
+                var boss = fish.GetComponent<Boss>();
+                if (boss != null)
                 {
-                    Debug.Log($"[Phase3Bomb] Boss hit but already stunned/invulnerable -> ignored");
-                    return;
+                    // spawn thịt
+                    if (boss.currentState is BossPhase3State phase3)
+                    {
+                        phase3.SpawnMeatOnBombHit(boss);
+                    }
+
+                    // stun boss
+                    boss.Stun(boss.phase3BombStunDuration);
+
+                    // bomb bị tiêu thụ
+                    MarkConsumed();
                 }
-
-                Debug.Log($"[Phase3Bomb] Boss hit by bomb ({name}) -> TakeDamage + SpawnMeat");
-                // Boss nhận damage + stun -> boss.TakeDamage tự set invulnerable
-                boss.TakeDamage(boss.phase3BombHitDamage, boss.phase3BombStunDuration);
-
-                // Spawn meat và bắt đầu quá trình ăn lại
-                if (boss.currentState is BossPhase3State phase3)
-                {
-                    phase3.SpawnMeatOnBombHit(boss);
-                    // gọi coroutine quản lý ăn thịt / nghỉ / quay lại phase
-                    boss.StartCoroutine(phase3.Phase3AfterStun(boss));
-                }
-
-                return;
             }
         }
     }
-
-
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -103,5 +97,10 @@ public class Phase3Bomb : MonoBehaviour
     /// <summary>
     /// Đánh dấu bomb đã xử lý (ví dụ khi BossPhase3State xử lý boss đâm bomb)
     /// </summary>
-
+    public void MarkConsumed()
+    {
+        consumed = true;
+        var col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+    }
 }

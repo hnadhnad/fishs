@@ -111,7 +111,7 @@ public class BossPhase3State : IBossState
         int total = Mathf.Max(4, boss.phase3BombCount);
         float stepDeg = 360f / total;
 
-        // 1) Tạo tất cả target trên vòng tròn
+        // 1) Tạo tất cả target trên vòng tròn (bắt đầu từ 90° = trên cùng, theo chiều kim đồng hồ)
         List<Vector3> allTargets = new List<Vector3>(total);
         for (int i = 0; i < total; i++)
         {
@@ -121,7 +121,7 @@ public class BossPhase3State : IBossState
             allTargets.Add(center + dir * boss.phase3CircleRadius);
         }
 
-        // 2) Phân tách trái / phải
+        // 2) Phân tách trái / phải dựa trên center.x (điểm x == center.x sẽ vào 'right' để tránh trùng)
         List<Vector3> leftTargets = new List<Vector3>();
         List<Vector3> rightTargets = new List<Vector3>();
         foreach (var t in allTargets)
@@ -130,11 +130,11 @@ public class BossPhase3State : IBossState
             else rightTargets.Add(t);
         }
 
-        // 3) Sort từ trên xuống
+        // 3) Sắp xếp top -> bottom (y giảm dần) để map đúng với spawn column top->bottom
         leftTargets.Sort((a, b) => b.y.CompareTo(a.y));
         rightTargets.Sort((a, b) => b.y.CompareTo(a.y));
 
-        // 4) Defensive split nếu lệch
+        // defensive split if one side empty (shouldn't for total>=4, nhưng phòng)
         if (leftTargets.Count == 0 || rightTargets.Count == 0)
         {
             leftTargets.Clear();
@@ -148,36 +148,43 @@ public class BossPhase3State : IBossState
             rightTargets.Sort((a, b) => b.y.CompareTo(a.y));
         }
 
+        // 4) Spawn columns positions (top -> bottom)
         var map = Object.FindObjectOfType<MapManager>();
+        float mapHalfHeight = map.MapSize.y / 2f;
+        float columnSpacingY = Mathf.Min(mapHalfHeight * 0.9f, boss.phase3ColumnHeight);
+
         float leftX = map.bottomLeft.x - boss.phase3BombSpawnOffscreen;
         float rightX = map.topRight.x + boss.phase3BombSpawnOffscreen;
 
         int leftCount = leftTargets.Count;
         int rightCount = rightTargets.Count;
 
-        // ✅ Spawn left column (trải full chiều cao map)
+        // Spawn left column (map top->bottom)
         for (int i = 0; i < leftCount; i++)
         {
             float tNorm = (leftCount == 1) ? 0.5f : (float)i / (leftCount - 1);
-            float y = Mathf.Lerp(map.topRight.y, map.bottomLeft.y, tNorm); // full map height
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, tNorm);
             Vector3 spawnPos = new Vector3(leftX, y, center.z);
 
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
             spawnedBombs.Add(b);
 
+            // gán radius vào Phase3Bomb component nếu có
             if (b.TryGetComponent<Phase3Bomb>(out var bombComp))
             {
                 bombComp.ApplyRadius(boss.phase3BombRadius);
             }
 
+
+            // move bomb to corresponding left target (top->bottom mapping)
             boss.StartCoroutine(MoveBombTo(b, leftTargets[i], boss.phase3BombMoveDuration));
         }
 
-        // ✅ Spawn right column (trải full chiều cao map)
+        // Spawn right column (map top->bottom)
         for (int i = 0; i < rightCount; i++)
         {
             float tNorm = (rightCount == 1) ? 0.5f : (float)i / (rightCount - 1);
-            float y = Mathf.Lerp(map.topRight.y, map.bottomLeft.y, tNorm); // full map height
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, tNorm);
             Vector3 spawnPos = new Vector3(rightX, y, center.z);
 
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
@@ -191,7 +198,6 @@ public class BossPhase3State : IBossState
             boss.StartCoroutine(MoveBombTo(b, rightTargets[i], boss.phase3BombMoveDuration));
         }
     }
-
 
     private IEnumerator MoveBombTo(GameObject bomb, Vector3 target, float duration)
     {

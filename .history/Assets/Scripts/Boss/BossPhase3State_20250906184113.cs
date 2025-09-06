@@ -19,19 +19,17 @@ public class BossPhase3State : IBossState
 
     public void Enter(Boss boss)
     {
-        // hunger reset...
+        // 🔥 Hồi đầy hunger và khóa không giảm
         boss.currentHunger = boss.maxHunger;
         boss.hungerDecayRate = 0f;
 
+        // 🔥 Tắt UI hunger
         if (boss.hungerBar != null)
             boss.hungerBar.gameObject.SetActive(false);
-
         if (routine != null) boss.StopCoroutine(routine);
-
-        // ✅ chỉ làm setup 1 lần ở Enter
-        routine = boss.StartCoroutine(Phase3Setup(boss));
+        // start coroutine
+        routine = boss.StartCoroutine(Phase3Routine(boss));
     }
-
 
     public void Update(Boss boss) { }
 
@@ -49,8 +47,25 @@ public class BossPhase3State : IBossState
         spawnedBombs.Clear();
     }
 
-    private IEnumerator Phase3DashLoop(Boss boss)
+    private IEnumerator Phase3Routine(Boss boss)
     {
+        var map = Object.FindObjectOfType<MapManager>();
+        if (map == null) yield break;
+
+        // vị trí giữa map
+        Vector3 center = (Vector3)((map.bottomLeft + map.topRight) / 2f);
+        center.z = boss.transform.position.z;
+
+        // 1) Boss đi về giữa map
+        yield return MoveTo(boss, center, boss.moveSpeed);
+
+        // 2) Spawn và move bombs từ 2 bên vào vị trí vòng tròn
+        SpawnAndArrangeBombs(boss, center);
+
+        // 3) Đợi bombs vào vị trí
+        yield return WaitForBombsInPosition();
+
+        // 4) Main loop: boss dash liên tục hướng về player
         while (boss != null && boss.currentHealth > 0f)
         {
             var player = GameObject.FindWithTag("Player");
@@ -69,6 +84,7 @@ public class BossPhase3State : IBossState
                 Vector3 newPos = Vector3.Lerp(start, end, t);
                 boss.transform.position = newPos;
 
+                // nếu boss bị stun (tức vừa dính bomb) → dừng dash ngay
                 if (boss.IsStunned)
                 {
                     hitBomb = true;
@@ -80,13 +96,14 @@ public class BossPhase3State : IBossState
 
             if (hitBomb)
             {
-                yield break; // Boss dính bom → Phase3AfterStun takeover
+                // ✅ Boss đã dính bomb → dừng dash loop, để Phase3AfterStun lo tiếp
+                yield break;
             }
 
+            // pause giữa các dash
             yield return new WaitForSeconds(boss.phase3DashInterval);
         }
     }
-
 
 
 
@@ -111,7 +128,7 @@ public class BossPhase3State : IBossState
         int total = Mathf.Max(4, boss.phase3BombCount);
         float stepDeg = 360f / total;
 
-        // 1) Tạo tất cả target trên vòng tròn
+        // 1) Tạo tất cả target trên vòng tròn (bắt đầu từ 90° = trên cùng, theo chiều kim đồng hồ)
         List<Vector3> allTargets = new List<Vector3>(total);
         for (int i = 0; i < total; i++)
         {
@@ -121,7 +138,7 @@ public class BossPhase3State : IBossState
             allTargets.Add(center + dir * boss.phase3CircleRadius);
         }
 
-        // 2) Phân tách trái / phải
+        // 2) Phân tách trái / phải dựa trên center.x (điểm x == center.x sẽ vào 'right' để tránh trùng)
         List<Vector3> leftTargets = new List<Vector3>();
         List<Vector3> rightTargets = new List<Vector3>();
         foreach (var t in allTargets)
@@ -130,11 +147,11 @@ public class BossPhase3State : IBossState
             else rightTargets.Add(t);
         }
 
-        // 3) Sort từ trên xuống
+        // 3) Sắp xếp top -> bottom (y giảm dần) để map đúng với spawn column top->bottom
         leftTargets.Sort((a, b) => b.y.CompareTo(a.y));
         rightTargets.Sort((a, b) => b.y.CompareTo(a.y));
 
-        // 4) Defensive split nếu lệch
+        // defensive split if one side empty (shouldn't for total>=4, nhưng phòng)
         if (leftTargets.Count == 0 || rightTargets.Count == 0)
         {
             leftTargets.Clear();
@@ -148,36 +165,43 @@ public class BossPhase3State : IBossState
             rightTargets.Sort((a, b) => b.y.CompareTo(a.y));
         }
 
+        // 4) Spawn columns positions (top -> bottom)
         var map = Object.FindObjectOfType<MapManager>();
+        float mapHalfHeight = map.MapSize.y / 2f;
+        float columnSpacingY = Mathf.Min(mapHalfHeight * 0.9f, boss.phase3ColumnHeight);
+
         float leftX = map.bottomLeft.x - boss.phase3BombSpawnOffscreen;
         float rightX = map.topRight.x + boss.phase3BombSpawnOffscreen;
 
         int leftCount = leftTargets.Count;
         int rightCount = rightTargets.Count;
 
-        // ✅ Spawn left column (trải full chiều cao map)
+        // Spawn left column (map top->bottom)
         for (int i = 0; i < leftCount; i++)
         {
             float tNorm = (leftCount == 1) ? 0.5f : (float)i / (leftCount - 1);
-            float y = Mathf.Lerp(map.topRight.y, map.bottomLeft.y, tNorm); // full map height
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, tNorm);
             Vector3 spawnPos = new Vector3(leftX, y, center.z);
 
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
             spawnedBombs.Add(b);
 
+            // gán radius vào Phase3Bomb component nếu có
             if (b.TryGetComponent<Phase3Bomb>(out var bombComp))
             {
                 bombComp.ApplyRadius(boss.phase3BombRadius);
             }
 
+
+            // move bomb to corresponding left target (top->bottom mapping)
             boss.StartCoroutine(MoveBombTo(b, leftTargets[i], boss.phase3BombMoveDuration));
         }
 
-        // ✅ Spawn right column (trải full chiều cao map)
+        // Spawn right column (map top->bottom)
         for (int i = 0; i < rightCount; i++)
         {
             float tNorm = (rightCount == 1) ? 0.5f : (float)i / (rightCount - 1);
-            float y = Mathf.Lerp(map.topRight.y, map.bottomLeft.y, tNorm); // full map height
+            float y = center.y + Mathf.Lerp(columnSpacingY * 0.5f, -columnSpacingY * 0.5f, tNorm);
             Vector3 spawnPos = new Vector3(rightX, y, center.z);
 
             GameObject b = Object.Instantiate(boss.phase3BombPrefab, spawnPos, Quaternion.identity);
@@ -191,7 +215,6 @@ public class BossPhase3State : IBossState
             boss.StartCoroutine(MoveBombTo(b, rightTargets[i], boss.phase3BombMoveDuration));
         }
     }
-
 
     private IEnumerator MoveBombTo(GameObject bomb, Vector3 target, float duration)
     {
@@ -228,11 +251,11 @@ public class BossPhase3State : IBossState
         float r = boss.phase3MeatSpawnRadius;         // bán kính spawn quanh boss
         int count = Mathf.Max(1, boss.phase3MeatCount);
         float healPerPiece = boss.phase3BombHitDamage / Mathf.Max(1, count);
-        float paddingFraction = boss.phase3MeatArcPadding; // phần trăm cung bỏ qua 2 bên
+        float paddingFraction = boss.phase3MeatArcPadding; // phần trăm cung bị bỏ qua
 
         float d = Vector2.Distance(new Vector2(center.x, center.y), new Vector2(bossPos.x, bossPos.y));
 
-        // Nếu boss nằm hoàn toàn trong vòng → spawn full circle
+        // Nếu boss ở trong vòng → spawn full circle
         if (d + r <= R)
         {
             float step = 2f * Mathf.PI / count;
@@ -255,7 +278,7 @@ public class BossPhase3State : IBossState
         // Circle-circle intersection
         float a = (r * r - R * R + d * d) / (2f * d);
         float h2 = r * r - a * a;
-        if (h2 < 0f) h2 = 0f; // ép về 0 thay vì return
+        if (h2 < 0f) return;
         float h = Mathf.Sqrt(h2);
 
         Vector3 dirSC = (center - bossPos) / d;
@@ -295,9 +318,7 @@ public class BossPhase3State : IBossState
 
         for (int i = 0; i < count; i++)
         {
-            float t = (count == 1) ? 0.5f : (float)i / (count - 1); // đảm bảo luôn đủ count
-            float ang = startAngle + pad + effectiveArc * t;
-
+            float ang = startAngle + pad + effectiveArc * (i + 0.5f) / count;
             Vector3 dir = new Vector3(Mathf.Cos(ang), Mathf.Sin(ang), 0f);
             Vector3 pos = bossPos + dir * r;
 
@@ -309,8 +330,7 @@ public class BossPhase3State : IBossState
 
 
 
-
-
+ 
 
 
     public IEnumerator Phase3AfterStun(Boss boss)
@@ -326,11 +346,11 @@ public class BossPhase3State : IBossState
         yield return new WaitForSeconds(boss.phase3RestAfterMeat);
 
         // ✅ tiếp tục dash player, không reset state (bomb vẫn giữ nguyên)
-        routine = boss.StartCoroutine(Phase3DashLoop(boss));
+        routine = boss.StartCoroutine(Phase3Routine(boss));
     }
 
 
-
+    
     private IEnumerator EatAllMeat(Boss boss)
     {
         // 🔥 Chờ boss hết stun trước khi ăn thịt
@@ -363,26 +383,5 @@ public class BossPhase3State : IBossState
             yield return null;
         }
     }
-    private IEnumerator Phase3Setup(Boss boss)
-    {
-        var map = Object.FindObjectOfType<MapManager>();
-        if (map == null) yield break;
-
-        Vector3 center = (Vector3)((map.bottomLeft + map.topRight) / 2f);
-        center.z = boss.transform.position.z;
-
-        // Boss đi về giữa map
-        yield return MoveTo(boss, center, boss.moveSpeed);
-
-        // Spawn bombs 1 lần
-        SpawnAndArrangeBombs(boss, center);
-
-        // Chờ bomb vào vị trí
-        yield return WaitForBombsInPosition();
-
-        // ✅ Sau đó chỉ còn dash loop
-        routine = boss.StartCoroutine(Phase3DashLoop(boss));
-}
-
 
 }

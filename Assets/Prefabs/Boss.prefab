@@ -154,15 +154,17 @@ MonoBehaviour:
   phase3BombMoveDuration: 5
   phase3BombSpawnOffscreen: 4
   phase3ColumnHeight: 6
-  phase3DashDistance: 8
-  phase3DashDuration: 1
+  phase3DashDistance: 10
+  phase3DashDuration: 1.5
   phase3DashInterval: 0.25
   phase3BombCollisionThreshold: 0.6
-  phase3BombStunDuration: 2
-  phase3BombHitDamage: 5
+  phase3BombStunDuration: 3
+  phase3BombHitDamage: 2
   phase3MeatCount: 4
   phase3MeatSpawnOffset: 0.8
   phase3RestAfterMeat: 1
+  phase3MeatSpawnRadius: 4
+  phase3MeatArcPadding: 0.2
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4

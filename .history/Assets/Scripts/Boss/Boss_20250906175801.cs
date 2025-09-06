@@ -154,9 +154,6 @@ public class Boss : MonoBehaviour
 
     public float phase3MeatSpawnRadius = 2f; // bán kính vòng thịt quanh boss
 
-    public float phase3MeatArcPadding = 0.1f; // 10% cung mỗi bên bị bỏ để thịt không sát bomb
-
-
 
 
 
