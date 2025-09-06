@@ -67,39 +67,32 @@ public class MapManager : MonoBehaviour
         Gizmos.DrawLine(new Vector3(tr.x, tr.y), new Vector3(tr.x, bl.y));
         Gizmos.DrawLine(new Vector3(tr.x, tr.y), new Vector3(bl.x, tr.y));
     }
-    public void ChangeBackground(Sprite newSprite, float newScale = 1f)
+    public void ChangeBackground(Sprite newSprite)
     {
-        if (newSprite == null) return;
-
-        // tìm object Background cũ
-        Transform bg = transform.Find("Background");
-        if (bg != null)
+        if (newSprite == null)
         {
-            Destroy(bg.gameObject);
+            Debug.LogError("ChangeBackground: newSprite null!");
+            return;
         }
 
-        // tạo object nền mới
-        GameObject newBg = new GameObject("Background");
-        newBg.transform.parent = this.transform;
+        // tìm background object
+        var bg = transform.Find("Background");
+        if (bg != null)
+        {
+            var sr = bg.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sprite = newSprite;
 
-        SpriteRenderer sr = newBg.AddComponent<SpriteRenderer>();
-        sr.sprite = newSprite;
+                // cập nhật lại kích thước map
+                Vector2 spriteSize = sr.sprite.bounds.size * mapScale;
+                MapSize = spriteSize;
+                bottomLeft = new Vector2(-spriteSize.x / 2f, -spriteSize.y / 2f);
+                topRight   = new Vector2( spriteSize.x / 2f,  spriteSize.y / 2f);
 
-        sr.sortingLayerName = "Default"; // hoặc Background
-        sr.sortingOrder = -100;
-
-        newBg.transform.localScale = Vector3.one * newScale;
-        newBg.transform.position = Vector3.zero;
-
-        // cập nhật lại MapSize / bottomLeft / topRight
-        Vector2 spriteSize = sr.sprite.bounds.size * newScale;
-        MapSize = spriteSize;
-
-        bottomLeft = new Vector2(-spriteSize.x / 2f, -spriteSize.y / 2f);
-        topRight   = new Vector2( spriteSize.x / 2f,  spriteSize.y / 2f);
-
-        Debug.Log($"[MapManager] Background changed! size = {MapSize}");
+                Debug.Log($"Background changed! new size = {MapSize}");
+            }
+        }
     }
-
 
 }

@@ -7,10 +7,6 @@ public class SkillManager : MonoBehaviour
     private FishMovement fishMovement;
     private bool[] skillUsed = new bool[4]; // 1..3
 
-    [Header("Debug / Testing")]
-    [Tooltip("Nếu tick thì luôn mở skill khiên ngay từ đầu mà không cần farm")]
-    public bool alwaysUnlockShield = false;
-
     // Shield state (skill 1)
     private bool shieldAvailable = false;
     private bool shieldConsumed = false;
@@ -25,15 +21,6 @@ public class SkillManager : MonoBehaviour
         fishMovement = FindObjectOfType<FishMovement>();
         if (SkillDraftUI.Instance != null)
             SkillDraftUI.Instance.OnSkillChosen += UseSkill;
-
-        // ✅ Nếu bật auto unlock shield trong editor
-        if (alwaysUnlockShield)
-        {
-            shieldAvailable = true;
-            shieldConsumed = false;
-            skillUsed[1] = true; // đánh dấu skill 1 đã dùng để tránh draft lại
-            Debug.Log("[SkillManager] Shield auto unlocked for testing!");
-        }
     }
 
     private void OnDestroy()

@@ -5,8 +5,6 @@ using System.Collections;
 [RequireComponent(typeof(Fish))]
 public class Boss : MonoBehaviour
 {
-    [HideInInspector] public bool inEnragedPhase = false;
-
     public bool allowPhaseTransition = true;
 
     [Header("Boss Stats")]
@@ -160,39 +158,6 @@ public class Boss : MonoBehaviour
 
     public float phase3MeatArcPadding = 0.1f; // 10% cung mỗi bên bị bỏ để thịt không sát bomb
 
-    // Enraged / final phase settings (add near other Phase3 fields)
-    [Header("Enraged (Final) Phase")]
-    public Sprite enragedBackground;   // sprite nền "bên trong bụng Boss"
-    public float enragedMapScale = 1f;  // scale riêng cho nền trong bụng
-
-
-    public float enragedWindupDuration = 2f;   // boss đứng vận sức
-    public float enragedSuckDuration = 2.5f;   // thời gian hút player
-    public float enragedSuckSpeed = 6f;        // speed used by MoveTowards when sucking
-
-    [Header("Inside Boss (Belly) Settings")]
-    public GameObject insideEdiblePrefab;
-    public GameObject insideHazardPrefab;
-    public GameObject insideHeartPrefab;
-
-    public float insideColumnSpawnInterval = 2f;
-    public float insideColumnSpeed = 2.5f;
-    public int insideColumnSlots = 5;
-    public float insideColumnItemSpacing = 1.2f;
-    public float insideColumnMargin = 1f;
-
-    // ⭐ Scale chỉnh cho từng loại prefab
-    public float insideEdibleScale = 1f;
-    public float insideHazardScale = 1f;
-    public float insideHeartScale = 1f;
-
-    // ⭐ Vị trí tim tính từ rìa phải map
-    public float insideHeartOffsetFromRight = 2f;
-
-
-
-
-
 
 
 
@@ -275,8 +240,6 @@ public class Boss : MonoBehaviour
 
     void HandlePhaseLogic()
     {
-        if (!allowPhaseTransition) return; // 🚫 không cho chuyển phase nếu đang ăn thịt
-
         if (currentHealth <= maxHealth * 0.2f)
         {
             if (!(currentState is BossEnragedState))
@@ -324,42 +287,15 @@ public class Boss : MonoBehaviour
         yield return new WaitForSeconds(duration);
         isInvulnerable = false;
     }
-    // Hook để bật animation/ hiệu ứng chuẩn bị (bạn có thể sửa để trigger Animator)
-    public void PlayEnragedPrepareAnimation()
+
+
+
+
+    void Die()
     {
-        if (animator != null)
-        {
-            // ví dụ: animator.SetTrigger("EnragedPrepare");
-            // bạn có thể đổi tên trigger / implement animation theo animator của bạn
-            animator.SetTrigger("EnragedPrepare");
-        }
-    }
+        if (bossUIPanel != null)
+            bossUIPanel.SetActive(false);
 
-
-    public void Die()
-    {
-        if (bossUIPanel != null) bossUIPanel.SetActive(false);
-
-         Debug.Log("[Boss] DieFinal() → Boss chết trong bụng!");
-
-        // 🔥 TODO: sau này bạn có thể thêm animation chết, particle, âm thanh, slow-motion...
-        // Ví dụ:
-        // animator.SetTrigger("DieFinal");
-
-        // Tắt AI/state machine
-        if (currentState != null)
-        {
-            currentState.Exit(this);
-            currentState = null;
-        }
-
-        // Có thể gọi GameManager để trigger Win screen
-        // if (GameManager.Instance != null)
-        // {
-        //     GameManager.Instance.OnBossDefeated();
-        // }
-
-        // Hủy Boss sau một chút delay để chơi animation nếu có
-        Destroy(gameObject, 1f);
+        Destroy(gameObject);
     }
 }

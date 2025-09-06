@@ -89,25 +89,13 @@ public class Fish : MonoBehaviour
         Fish otherFish = other.GetComponent<Fish>();
         if (otherFish == null) return;
 
+        // Boss luôn ăn player
         Boss boss = GetComponent<Boss>();
         if (boss != null && otherFish.isPlayer)
         {
-            // nếu boss đang ở Enraged phase
-            if (boss.inEnragedPhase)
-            {
-                Fish playerFish = otherFish.GetComponent<Fish>();
-                if (playerFish != null)
-                {
-                    playerFish.Die(); // sẽ tự check shield trong Die()
-                }
-            }
-            else
-            {
-                Eat(otherFish);
-            }
+            Eat(otherFish);
             return;
         }
-
 
         // Nếu cùng size thì không ai ăn ai
         if (Mathf.Approximately(this.size, otherFish.size)) return;
@@ -180,10 +168,6 @@ public class Fish : MonoBehaviour
     /// <summary>
     /// Hàm chết chung cho Player/Enemy
     /// </summary>
-// trong class Fish: thêm field (ở chỗ biến lớp, phía trên)
-[HideInInspector] public bool wasSavedByShield = false;
-
-// --------- thay thế hàm Die() -------------
     public virtual void Die()
     {
         if (isPlayer)
@@ -191,13 +175,8 @@ public class Fish : MonoBehaviour
             // ✅ Check shield trước khi chết
             if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
             {
-                // mark rằng player vừa được cứu (để các logic khác biết)
-                wasSavedByShield = true;
-
-                // tiêu thụ khiên
-                SkillManager.Instance.ConsumeShield();
-
                 Debug.Log("Player được cứu bởi Shield, không chết!");
+                SkillManager.Instance.ConsumeShield();
                 return; // không die
             }
 
@@ -214,7 +193,6 @@ public class Fish : MonoBehaviour
 
         Destroy(gameObject);
     }
-
 
 
 }

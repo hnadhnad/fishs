@@ -130,50 +130,42 @@ public class FishMovement : MonoBehaviour
         {
             if (Time.time >= dashEndTime)
             {
+                // dash xong thì để lại vận tốc còn sót để giảm dần
                 isDashing = false;
             }
         }
 
         if (!isDashing)
         {
-            if (movementLocked)
+            // --- di chuyển bình thường ---
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldPos.z = 0f;
+
+            Vector2 moveDir = (mouseWorldPos - transform.position);
+            float distance = moveDir.magnitude;
+
+            if (distance > stopDistance)
             {
-                // boss đang hút → player đứng yên
+                moveDir.Normalize();
+                currentVelocity = Vector2.MoveTowards(
+                    currentVelocity,
+                    moveDir * maxSpeed,
+                    acceleration * Time.fixedDeltaTime
+                );
+            }
+            else
+            {
                 currentVelocity = Vector2.MoveTowards(
                     currentVelocity,
                     Vector2.zero,
                     deceleration * Time.fixedDeltaTime
                 );
             }
-            else
-            {
-                // --- di chuyển bình thường ---
-                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                mouseWorldPos.z = 0f;
-
-                Vector2 moveDir = (mouseWorldPos - transform.position);
-                float distance = moveDir.magnitude;
-
-                if (distance > stopDistance)
-                {
-                    moveDir.Normalize();
-                    currentVelocity = Vector2.MoveTowards(
-                        currentVelocity,
-                        moveDir * maxSpeed,
-                        acceleration * Time.fixedDeltaTime
-                    );
-                }
-                else
-                {
-                    currentVelocity = Vector2.MoveTowards(
-                        currentVelocity,
-                        Vector2.zero,
-                        deceleration * Time.fixedDeltaTime
-                    );
-                }
-            }
         }
-        // else: đang dash → giữ nguyên currentVelocity
+        else
+        {
+            // khi đang dash → velocity giữ nguyên (quán tính sau dash sẽ tính sau)
+        }
 
         // clamp trong map
         Vector2 newPos = rb.position + currentVelocity * Time.fixedDeltaTime;
@@ -183,7 +175,6 @@ public class FishMovement : MonoBehaviour
         rb.MovePosition(newPos);
         UpdateVisual(currentVelocity);
     }
-
 
     void StartDash()
     {

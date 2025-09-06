@@ -132,13 +132,6 @@ public class BossEnragedState : IBossState
                 );
                 playerGO.transform.position = spawnPos;
 
-                // 🔥 Teleport boss ra xa để không nhìn thấy
-                float hideDistance = 50f; // chỉnh khoảng cách boss bị đưa ra xa
-                boss.transform.position = new Vector3(map.topRight.x + hideDistance, 999f, 0f);
-
-                // Cho boss đứng yên
-                boss.moveSpeed = 0f;
-
                 // 🔥 Bắt đầu loop spawn cột dọc
                 if (insideLoopRoutine == null)
                     insideLoopRoutine = boss.StartCoroutine(StartInsideLoop(boss));
@@ -184,25 +177,31 @@ public class BossEnragedState : IBossState
     private void SpawnColumn(Boss boss, MapManager map)
     {
         float spawnX = map.topRight.x + boss.insideColumnMargin;
-        float minY = map.bottomLeft.y;
-        float maxY = map.topRight.y;
+        float centerY = (map.bottomLeft.y + map.topRight.y) / 2f;
 
         GameObject column = new GameObject("InsideColumn");
-        column.transform.position = new Vector3(spawnX, (minY + maxY) / 2f, 0f);
+        column.transform.position = new Vector3(spawnX, centerY, 0f);
 
-        // Tính spacing tự động theo chiều cao map
-        float spacing = (maxY - minY) / (boss.insideColumnSlots + 1);
+        float totalHeight = boss.insideColumnItemSpacing * (boss.insideColumnSlots - 1);
+        float startY = centerY + totalHeight / 2f;
 
+        bool heartSpawned = false;
         for (int i = 0; i < boss.insideColumnSlots; i++)
         {
-            float y = minY + spacing * (i + 1); // dàn đều giữa minY và maxY
+            float y = startY - i * boss.insideColumnItemSpacing;
             Vector3 pos = new Vector3(spawnX, y, 0f);
 
             float r = Random.value;
             GameObject prefab = null;
             float scale = 1f;
 
-            if (r < 0.65f && boss.insideEdiblePrefab != null)
+            if (!heartSpawned && r < 0.05f && boss.insideHeartPrefab != null)
+            {
+                prefab = boss.insideHeartPrefab;
+                scale = boss.insideHeartScale;
+                heartSpawned = true;
+            }
+            else if (r < 0.65f && boss.insideEdiblePrefab != null)
             {
                 prefab = boss.insideEdiblePrefab;
                 scale = boss.insideEdibleScale;
@@ -221,20 +220,7 @@ public class BossEnragedState : IBossState
         }
 
         boss.StartCoroutine(MoveColumn(column, boss, map));
-
-        // ⭐ Spawn heart riêng, không theo cột
-        if (boss.insideHeartPrefab != null)
-        {
-            Vector3 heartPos = new Vector3(
-                map.topRight.x - boss.insideHeartOffsetFromRight,
-                (minY + maxY) / 2f,
-                0f
-            );
-            var heart = Object.Instantiate(boss.insideHeartPrefab, heartPos, Quaternion.identity);
-            heart.transform.localScale = Vector3.one * boss.insideHeartScale;
-        }
     }
-
 
 
 

@@ -132,13 +132,6 @@ public class BossEnragedState : IBossState
                 );
                 playerGO.transform.position = spawnPos;
 
-                // 🔥 Teleport boss ra xa để không nhìn thấy
-                float hideDistance = 50f; // chỉnh khoảng cách boss bị đưa ra xa
-                boss.transform.position = new Vector3(map.topRight.x + hideDistance, 999f, 0f);
-
-                // Cho boss đứng yên
-                boss.moveSpeed = 0f;
-
                 // 🔥 Bắt đầu loop spawn cột dọc
                 if (insideLoopRoutine == null)
                     insideLoopRoutine = boss.StartCoroutine(StartInsideLoop(boss));

@@ -89,25 +89,13 @@ public class Fish : MonoBehaviour
         Fish otherFish = other.GetComponent<Fish>();
         if (otherFish == null) return;
 
+        // Boss luôn ăn player
         Boss boss = GetComponent<Boss>();
         if (boss != null && otherFish.isPlayer)
         {
-            // nếu boss đang ở Enraged phase
-            if (boss.inEnragedPhase)
-            {
-                Fish playerFish = otherFish.GetComponent<Fish>();
-                if (playerFish != null)
-                {
-                    playerFish.Die(); // sẽ tự check shield trong Die()
-                }
-            }
-            else
-            {
-                Eat(otherFish);
-            }
+            Eat(otherFish);
             return;
         }
-
 
         // Nếu cùng size thì không ai ăn ai
         if (Mathf.Approximately(this.size, otherFish.size)) return;

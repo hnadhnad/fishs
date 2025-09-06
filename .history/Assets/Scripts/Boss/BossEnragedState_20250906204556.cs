@@ -12,8 +12,6 @@ using UnityEngine;
 public class BossEnragedState : IBossState
 {
     private Coroutine routine;
-    private Coroutine insideLoopRoutine;
-
 
     public void Enter(Boss boss)
     {
@@ -26,7 +24,8 @@ public class BossEnragedState : IBossState
         boss.hungerDecayRate = 0f;
 
         // 🔥 Tắt UI hunger
-        if (boss.hungerBar != null) boss.hungerBar.gameObject.SetActive(false);
+        if (boss.hungerBar != null)
+            boss.hungerBar.gameObject.SetActive(false);
     }
 
     public void Update(Boss boss) { }
@@ -115,6 +114,7 @@ public class BossEnragedState : IBossState
                 fish.wasSavedByShield = false; // reset flag
                 Debug.Log("[BossEnragedState] fish.wasSavedByShield -> treat as saved");
             }
+
             if (shieldSaved)
             {
                 Debug.Log("[BossEnragedState] Player saved by shield. Changing background to inside-boss.");
@@ -131,17 +131,6 @@ public class BossEnragedState : IBossState
                     playerGO.transform.position.z
                 );
                 playerGO.transform.position = spawnPos;
-
-                // 🔥 Teleport boss ra xa để không nhìn thấy
-                float hideDistance = 50f; // chỉnh khoảng cách boss bị đưa ra xa
-                boss.transform.position = new Vector3(map.topRight.x + hideDistance, 999f, 0f);
-
-                // Cho boss đứng yên
-                boss.moveSpeed = 0f;
-
-                // 🔥 Bắt đầu loop spawn cột dọc
-                if (insideLoopRoutine == null)
-                    insideLoopRoutine = boss.StartCoroutine(StartInsideLoop(boss));
 
                 if (fm != null) fm.UnlockMovement();
                 boss.allowPhaseTransition = true;
@@ -168,94 +157,4 @@ public class BossEnragedState : IBossState
             yield return null;
         }
     }
-    /// Gọi cái này sau khi player teleport vào bụng boss
-    private IEnumerator StartInsideLoop(Boss boss)
-    {
-        var map = Object.FindObjectOfType<MapManager>();
-        if (map == null) yield break;
-
-        while (boss != null && boss.currentHealth > 0f)
-        {
-            SpawnColumn(boss, map);
-            yield return new WaitForSeconds(boss.insideColumnSpawnInterval);
-        }
-    }
-
-    private void SpawnColumn(Boss boss, MapManager map)
-    {
-        float spawnX = map.topRight.x + boss.insideColumnMargin;
-        float minY = map.bottomLeft.y;
-        float maxY = map.topRight.y;
-
-        GameObject column = new GameObject("InsideColumn");
-        column.transform.position = new Vector3(spawnX, (minY + maxY) / 2f, 0f);
-
-        // Tính spacing tự động theo chiều cao map
-        float spacing = (maxY - minY) / (boss.insideColumnSlots + 1);
-
-        for (int i = 0; i < boss.insideColumnSlots; i++)
-        {
-            float y = minY + spacing * (i + 1); // dàn đều giữa minY và maxY
-            Vector3 pos = new Vector3(spawnX, y, 0f);
-
-            float r = Random.value;
-            GameObject prefab = null;
-            float scale = 1f;
-
-            if (r < 0.65f && boss.insideEdiblePrefab != null)
-            {
-                prefab = boss.insideEdiblePrefab;
-                scale = boss.insideEdibleScale;
-            }
-            else if (boss.insideHazardPrefab != null)
-            {
-                prefab = boss.insideHazardPrefab;
-                scale = boss.insideHazardScale;
-            }
-
-            if (prefab != null)
-            {
-                var go = Object.Instantiate(prefab, pos, Quaternion.identity, column.transform);
-                go.transform.localScale = Vector3.one * scale;
-            }
-        }
-
-        boss.StartCoroutine(MoveColumn(column, boss, map));
-
-        // ⭐ Spawn heart riêng, không theo cột
-        if (boss.insideHeartPrefab != null)
-        {
-            Vector3 heartPos = new Vector3(
-                map.topRight.x - boss.insideHeartOffsetFromRight,
-                (minY + maxY) / 2f,
-                0f
-            );
-            var heart = Object.Instantiate(boss.insideHeartPrefab, heartPos, Quaternion.identity);
-            heart.transform.localScale = Vector3.one * boss.insideHeartScale;
-        }
-    }
-
-
-
-
-    private IEnumerator MoveColumn(GameObject column, Boss boss, MapManager map)
-    {
-        float leftLimit = map.bottomLeft.x - 2f;
-
-        while (column != null && boss != null && boss.currentHealth > 0f)
-        {
-            column.transform.position += Vector3.left * boss.insideColumnSpeed * Time.deltaTime;
-
-            if (column.transform.position.x < leftLimit)
-            {
-                Object.Destroy(column);
-                yield break;
-            }
-
-            yield return null;
-        }
-
-        if (column != null) Object.Destroy(column);
-    }
-
 }

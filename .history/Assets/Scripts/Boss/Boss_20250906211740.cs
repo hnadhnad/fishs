@@ -181,16 +181,6 @@ public class Boss : MonoBehaviour
     public float insideColumnItemSpacing = 1.2f;
     public float insideColumnMargin = 1f;
 
-    // ⭐ Scale chỉnh cho từng loại prefab
-    public float insideEdibleScale = 1f;
-    public float insideHazardScale = 1f;
-    public float insideHeartScale = 1f;
-
-    // ⭐ Vị trí tim tính từ rìa phải map
-    public float insideHeartOffsetFromRight = 2f;
-
-
-
 
 
 
@@ -338,28 +328,9 @@ public class Boss : MonoBehaviour
 
     public void Die()
     {
-        if (bossUIPanel != null) bossUIPanel.SetActive(false);
+        if (bossUIPanel != null)
+            bossUIPanel.SetActive(false);
 
-         Debug.Log("[Boss] DieFinal() → Boss chết trong bụng!");
-
-        // 🔥 TODO: sau này bạn có thể thêm animation chết, particle, âm thanh, slow-motion...
-        // Ví dụ:
-        // animator.SetTrigger("DieFinal");
-
-        // Tắt AI/state machine
-        if (currentState != null)
-        {
-            currentState.Exit(this);
-            currentState = null;
-        }
-
-        // Có thể gọi GameManager để trigger Win screen
-        // if (GameManager.Instance != null)
-        // {
-        //     GameManager.Instance.OnBossDefeated();
-        // }
-
-        // Hủy Boss sau một chút delay để chơi animation nếu có
-        Destroy(gameObject, 1f);
+        Destroy(gameObject);
     }
 }

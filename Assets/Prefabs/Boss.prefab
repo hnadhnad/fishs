@@ -100,8 +100,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73489d3983079a64f9fe2dae1c384133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inEnragedPhase: 0
+  allowPhaseTransition: 1
   maxHealth: 100
-  currentHealth: 48
+  currentHealth: 19
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -165,6 +167,23 @@ MonoBehaviour:
   phase3RestAfterMeat: 1
   phase3MeatSpawnRadius: 4
   phase3MeatArcPadding: 0.2
+  enragedBackground: {fileID: 21300000, guid: 1898da716b932214aa2e603a19fef9c7, type: 3}
+  enragedMapScale: 3.5
+  enragedWindupDuration: 1
+  enragedSuckDuration: 1
+  enragedSuckSpeed: 6
+  insideEdiblePrefab: {fileID: 2215705058270352124, guid: b4d5c3dfd387ffd4c91c445ae6b6bfcf, type: 3}
+  insideHazardPrefab: {fileID: 5251092376963797991, guid: da1821f3a130a054786d36afdde64bf1, type: 3}
+  insideHeartPrefab: {fileID: 4888898023618154534, guid: 7ff990dfd3f90b94295849b4bd34026b, type: 3}
+  insideColumnSpawnInterval: 2
+  insideColumnSpeed: 2.5
+  insideColumnSlots: 5
+  insideColumnItemSpacing: 1.2
+  insideColumnMargin: 1
+  insideEdibleScale: 2
+  insideHazardScale: 2
+  insideHeartScale: 2
+  insideHeartOffsetFromRight: 2
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4
@@ -260,3 +279,4 @@ MonoBehaviour:
   despawnMargin: 1
   spawnGraceTime: 1.5
   hungerValue: 10
+  wasSavedByShield: 0

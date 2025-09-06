@@ -181,12 +181,9 @@ public class Boss : MonoBehaviour
     public float insideColumnItemSpacing = 1.2f;
     public float insideColumnMargin = 1f;
 
-    // ⭐ Scale chỉnh cho từng loại prefab
-    public float insideEdibleScale = 1f;
-    public float insideHazardScale = 1f;
-    public float insideHeartScale = 1f;
+    // thông số riêng
+    public float insideEdibleHungerRestore = 30f;
 
-    // ⭐ Vị trí tim tính từ rìa phải map
     public float insideHeartOffsetFromRight = 2f;
 
 
