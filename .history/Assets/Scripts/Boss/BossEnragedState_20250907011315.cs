@@ -185,14 +185,14 @@ public class BossEnragedState : IBossState
     // pattern 8x11: 0 = trống, 1 = hazard, 2 = edible
     private int[,] bellyPattern = new int[8, 11]
     {
-        {1,1,1,1,1,0,1,1,2,1,1},
-        {1,1,0,1,0,1,1,1,1,1,0},
+        {1,1,1,1,1,0,1,1,2,1,0},
+        {0,1,0,1,0,1,1,1,1,2,0},
         {0,1,1,1,1,1,1,1,1,2,1},
-        {1,1,1,0,1,0,1,0,1,1,1},
+        {1,1,0,1,1,0,1,0,1,1,1},
         {1,0,1,1,1,1,1,1,1,0,1},
         {1,1,0,1,1,1,0,1,1,1,1},
-        {2,1,1,1,0,1,1,1,0,1,0},
-        {1,1,1,1,1,1,1,0,1,1,1},
+        {2,1,1,0,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,0,1,1,1,1},
     };
     private int patternColumnIndex = 0;
 
@@ -216,8 +216,7 @@ public class BossEnragedState : IBossState
             int cell = bellyPattern[row, patternColumnIndex];
             if (cell == 0) continue;
 
-            float y = maxY - spacing * row;
-
+            float y = minY + spacing * row;
             Vector3 pos = new Vector3(spawnX, y, 0f);
 
             GameObject prefab = null;

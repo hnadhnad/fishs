@@ -401,43 +401,53 @@ public class Boss : MonoBehaviour
     /// </summary>
     public void UpdateVisualFromDelta(Vector3 delta)
     {
+        // nếu baseScale chưa được gán (phòng trường hợp), gán tạm từ transform
+        if (baseScale == Vector3.zero)
+            baseScale = transform.localScale;
+
         Vector2 moveDir = new Vector2(delta.x, delta.y);
 
-        // Nếu gần như đứng yên: chỉ reset tilt dần về 0, giữ nguyên scale gốc
-        if (moveDir.sqrMagnitude < 0.0001f)
+        // nếu gần như đứng yên => dần đưa về rotation = 0, giữ nguyên scale gốc
+        if (moveDir.magnitude < 0.001f)
         {
             Quaternion targetRot = Quaternion.Euler(0f, 0f, 0f);
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRot, tiltLerpSpeed * Time.deltaTime);
+
+            // giữ nguyên scale gốc (không thay đổi)
+            transform.localScale = baseScale;
             return;
         }
 
-        // Flip X theo hướng di chuyển
-        if (Mathf.Abs(moveDir.x) > 0.01f) // deadzone nhỏ để tránh giật
+        // Flip X theo hướng ngang nếu vượt deadzone nhỏ
+        if (Mathf.Abs(moveDir.x) > flipDeadzoneX)
         {
-            Vector3 s = transform.localScale;
-            s.x = Mathf.Abs(s.x) * Mathf.Sign(moveDir.x); // chỉ đổi dấu X, giữ nguyên Y/Z
-            transform.localScale = s;
+            float signX = Mathf.Sign(moveDir.x);
+            transform.localScale = new Vector3(signX * Mathf.Abs(baseScale.x), baseScale.y, baseScale.z);
+        }
+        else
+        {
+            // giữ nguyên flip hiện tại nhưng đảm bảo Y/Z theo baseScale (tránh bị thay đổi bởi code khác)
+            transform.localScale = new Vector3(transform.localScale.x, baseScale.y, baseScale.z);
         }
 
-        // Tilt theo hướng dọc
+        // Tilt (nghiêng) theo thành phần Y
         float yRatio = moveDir.y / moveDir.magnitude;
         float tiltThreshold = 0.3f;
-        float targetTilt = 0f;
 
+        float targetTilt = 0f;
         if (Mathf.Abs(yRatio) > tiltThreshold)
         {
             float normalizedY = (Mathf.Abs(yRatio) - tiltThreshold) / (1f - tiltThreshold);
             targetTilt = Mathf.Clamp(normalizedY * maxTiltAngle * Mathf.Sign(moveDir.y), -maxTiltAngle, maxTiltAngle);
         }
 
-        // tilt đi theo hướng flip
-        float signForTilt = Mathf.Sign(transform.localScale.x);
+        // tilt phải tuân theo hướng flip (nếu flip X = -1 thì tilt đảo chiều)
+        float signForTilt = Mathf.Sign(transform.localScale.x != 0f ? transform.localScale.x : baseScale.x);
         targetTilt *= signForTilt;
 
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetTilt);
         transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, tiltLerpSpeed * Time.deltaTime);
     }
-
 
 
 

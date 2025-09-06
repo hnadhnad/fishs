@@ -182,56 +182,38 @@ public class BossEnragedState : IBossState
     }
     
 
-    // pattern 8x11: 0 = trống, 1 = hazard, 2 = edible
-    private int[,] bellyPattern = new int[8, 11]
-    {
-        {1,1,1,1,1,0,1,1,2,1,1},
-        {1,1,0,1,0,1,1,1,1,1,0},
-        {0,1,1,1,1,1,1,1,1,2,1},
-        {1,1,1,0,1,0,1,0,1,1,1},
-        {1,0,1,1,1,1,1,1,1,0,1},
-        {1,1,0,1,1,1,0,1,1,1,1},
-        {2,1,1,1,0,1,1,1,0,1,0},
-        {1,1,1,1,1,1,1,0,1,1,1},
-    };
-    private int patternColumnIndex = 0;
-
     private void SpawnColumn(Boss boss, MapManager map)
     {
         float spawnX = map.topRight.x + boss.insideColumnMargin;
 
-        // Biên map
-        float minY = map.bottomLeft.y + boss.insideColumnMargin;
-        float maxY = map.topRight.y - boss.insideColumnMargin;
+        // Lấy biên map
+        float minY = map.bottomLeft.y + boss.insideColumnMargin; // margin dưới
+        float maxY = map.topRight.y - boss.insideColumnMargin;   // margin trên
 
-        GameObject column = new GameObject("InsidePatternColumn");
+        GameObject column = new GameObject("InsideColumn");
         column.transform.position = new Vector3(spawnX, (minY + maxY) / 2f, 0f);
 
-        // spacing tự động dàn đều theo số hàng pattern (8 hàng)
-        int rows = bellyPattern.GetLength(0);
-        float spacing = (maxY - minY) / (rows - 1);
+        // spacing tự động dàn đều
+        float spacing = (maxY - minY) / (boss.insideColumnSlots - 1);
 
-        for (int row = 0; row < rows; row++)
+        for (int i = 0; i < boss.insideColumnSlots; i++)
         {
-            int cell = bellyPattern[row, patternColumnIndex];
-            if (cell == 0) continue;
-
-            float y = maxY - spacing * row;
-
+            float y = minY + spacing * i;
             Vector3 pos = new Vector3(spawnX, y, 0f);
 
+            float r = Random.value;
             GameObject prefab = null;
             float scale = 1f;
 
-            if (cell == 1 && boss.insideHazardPrefab != null)
-            {
-                prefab = boss.insideHazardPrefab;
-                scale = boss.insideHazardScale;
-            }
-            else if (cell == 2 && boss.insideEdiblePrefab != null)
+            if (r < 0.65f && boss.insideEdiblePrefab != null)
             {
                 prefab = boss.insideEdiblePrefab;
                 scale = boss.insideEdibleScale;
+            }
+            else if (boss.insideHazardPrefab != null)
+            {
+                prefab = boss.insideHazardPrefab;
+                scale = boss.insideHazardScale;
             }
 
             if (prefab != null)
@@ -243,7 +225,7 @@ public class BossEnragedState : IBossState
 
         boss.StartCoroutine(MoveColumn(column, boss, map));
 
-        // ⭐ Spawn heart riêng
+        // ⭐ Spawn heart riêng, không phụ thuộc cột
         if (boss.insideHeartPrefab != null)
         {
             Vector3 heartPos = new Vector3(
@@ -254,13 +236,7 @@ public class BossEnragedState : IBossState
             var heart = Object.Instantiate(boss.insideHeartPrefab, heartPos, Quaternion.identity);
             heart.transform.localScale = Vector3.one * boss.insideHeartScale;
         }
-
-        // next column (loop lại nếu hết 11 cột)
-        patternColumnIndex++;
-        if (patternColumnIndex >= bellyPattern.GetLength(1))
-            patternColumnIndex = 0;
     }
-
 
 
 

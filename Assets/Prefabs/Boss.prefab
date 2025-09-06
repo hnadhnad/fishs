@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -56,7 +56,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 2bad47ca2884d3844a8252e169330865, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -77,11 +77,11 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 294036c2983caf74586b8324f1ca632f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
-  m_DrawMode: 2
+  m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
@@ -103,7 +103,7 @@ MonoBehaviour:
   inEnragedPhase: 0
   allowPhaseTransition: 1
   maxHealth: 100
-  currentHealth: 19
+  currentHealth: 0
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -113,11 +113,11 @@ MonoBehaviour:
   hungerBar: {fileID: 0}
   fish: {fileID: 0}
   animator: {fileID: 0}
-  moveSpeed: 5
+  moveSpeed: 4
   chaseLureSpeed: 5
   phase1DashCount: 3
-  phase1DashDistance: 10
-  phase1DashDuration: 0.75
+  phase1DashDistance: 5
+  phase1DashDuration: 1
   phase1DashInterval: 1
   phase1DashImpactPause: 0.12
   phase1BulletPrefab: {fileID: 1547457209301159574, guid: a6a246ab37bd18a4fb9ee432871b8293, type: 3}
@@ -177,13 +177,17 @@ MonoBehaviour:
   insideHeartPrefab: {fileID: 4888898023618154534, guid: 7ff990dfd3f90b94295849b4bd34026b, type: 3}
   insideColumnSpawnInterval: 2
   insideColumnSpeed: 2.5
-  insideColumnSlots: 5
-  insideColumnItemSpacing: 1.2
+  insideColumnSlots: 8
   insideColumnMargin: 1
+  insideColumnTopMargin: 0.75
+  insideColumnBottomMargin: 0.75
   insideEdibleScale: 2
   insideHazardScale: 2
   insideHeartScale: 2
   insideHeartOffsetFromRight: 2
+  maxTiltAngle: 20
+  tiltLerpSpeed: 6
+  flipDeadzoneX: 0.01
 --- !u!50 &-5547849903450833211
 Rigidbody2D:
   serializedVersion: 4
@@ -245,12 +249,12 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.25, y: 0.25, z: 0.25, w: 0.25}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 4.733333, y: 2.1333334}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 2
+    drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2

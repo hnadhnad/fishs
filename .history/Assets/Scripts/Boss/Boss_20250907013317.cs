@@ -195,12 +195,8 @@ public class Boss : MonoBehaviour
     public float tiltLerpSpeed = 6f;
 
     // internal
-    private Vector3 baseScale;
-
+    private float baseScaleX;
     private Vector3 _lastVisualPos;
-
-    public float flipDeadzoneX = 0.01f; // public để chỉnh trong Inspector nếu cần
-
 
 
 
@@ -216,11 +212,11 @@ public class Boss : MonoBehaviour
     {
         fish = GetComponent<Fish>();
 
-        baseScale = transform.localScale; // scale gốc (không absolute)
         // giữ base scale x (dùng để lật mặt lúc di chuyển)
+        baseScaleX = Mathf.Abs(transform.localScale.x);
         // init last pos (dùng nếu bật auto update mỗi frame)
         _lastVisualPos = transform.position;
-
+        
 
         animator = GetComponent<Animator>();
 
@@ -277,7 +273,7 @@ public class Boss : MonoBehaviour
         if (healthBar != null) healthBar.value = currentHealth;
         if (hungerBar != null) hungerBar.value = currentHunger;
 
-        // 🔥 Giảm stunTimer theo thời gian
+                // 🔥 Giảm stunTimer theo thời gian
         if (stunTimer > 0f)
         {
             stunTimer -= Time.deltaTime;
@@ -287,12 +283,6 @@ public class Boss : MonoBehaviour
 
         // Update logic của state hiện tại
         currentState?.Update(this);
-
-        // auto update visual mỗi frame bằng delta so với frame trước
-        Vector3 delta = transform.position - _lastVisualPos;
-        UpdateVisualFromDelta(delta);
-        _lastVisualPos = transform.position;
-
 
         // Check phase chuyển đổi (giữ nguyên)
         HandlePhaseLogic();
@@ -367,7 +357,7 @@ public class Boss : MonoBehaviour
     {
         if (bossUIPanel != null) bossUIPanel.SetActive(false);
 
-        Debug.Log("[Boss] DieFinal() → Boss chết trong bụng!");
+         Debug.Log("[Boss] DieFinal() → Boss chết trong bụng!");
 
         // 🔥 TODO: sau này bạn có thể thêm animation chết, particle, âm thanh, slow-motion...
         // Ví dụ:
@@ -389,60 +379,4 @@ public class Boss : MonoBehaviour
         // Hủy Boss sau một chút delay để chơi animation nếu có
         Destroy(gameObject, 1f);
     }
-    
-   
-    /// Cập nhật visual của boss dựa vào delta movement (newPos - oldPos).
-    /// Cơ chế giống FishMovement.UpdateVisual: flip X theo hướng, tilt theo Y, scale theo fish.size.
-    /// Gọi hàm này sau khi di chuyển boss 1 lần (tốt nhất: capture oldPos -> move -> gọi UpdateVisualFromDelta(newPos - oldPos)).
-    /// </summary>
-    /// <summary>
-    /// Cập nhật visual của boss dựa vào delta movement (newPos - oldPos).
-    /// Giữ nguyên scale gốc (không phóng to/nhỏ), chỉ flip X (đổi dấu) và tilt Z.
-    /// </summary>
-    public void UpdateVisualFromDelta(Vector3 delta)
-    {
-        Vector2 moveDir = new Vector2(delta.x, delta.y);
-
-        // Nếu gần như đứng yên: chỉ reset tilt dần về 0, giữ nguyên scale gốc
-        if (moveDir.sqrMagnitude < 0.0001f)
-        {
-            Quaternion targetRot = Quaternion.Euler(0f, 0f, 0f);
-            transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRot, tiltLerpSpeed * Time.deltaTime);
-            return;
-        }
-
-        // Flip X theo hướng di chuyển
-        if (Mathf.Abs(moveDir.x) > 0.01f) // deadzone nhỏ để tránh giật
-        {
-            Vector3 s = transform.localScale;
-            s.x = Mathf.Abs(s.x) * Mathf.Sign(moveDir.x); // chỉ đổi dấu X, giữ nguyên Y/Z
-            transform.localScale = s;
-        }
-
-        // Tilt theo hướng dọc
-        float yRatio = moveDir.y / moveDir.magnitude;
-        float tiltThreshold = 0.3f;
-        float targetTilt = 0f;
-
-        if (Mathf.Abs(yRatio) > tiltThreshold)
-        {
-            float normalizedY = (Mathf.Abs(yRatio) - tiltThreshold) / (1f - tiltThreshold);
-            targetTilt = Mathf.Clamp(normalizedY * maxTiltAngle * Mathf.Sign(moveDir.y), -maxTiltAngle, maxTiltAngle);
-        }
-
-        // tilt đi theo hướng flip
-        float signForTilt = Mathf.Sign(transform.localScale.x);
-        targetTilt *= signForTilt;
-
-        Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetTilt);
-        transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, tiltLerpSpeed * Time.deltaTime);
-    }
-
-
-
-
-
-
-
-
 }

@@ -195,12 +195,10 @@ public class Boss : MonoBehaviour
     public float tiltLerpSpeed = 6f;
 
     // internal
+    private float baseScaleX;
     private Vector3 baseScale;
 
     private Vector3 _lastVisualPos;
-
-    public float flipDeadzoneX = 0.01f; // public để chỉnh trong Inspector nếu cần
-
 
 
 
@@ -218,6 +216,7 @@ public class Boss : MonoBehaviour
 
         baseScale = transform.localScale; // scale gốc (không absolute)
         // giữ base scale x (dùng để lật mặt lúc di chuyển)
+        baseScaleX = Mathf.Abs(transform.localScale.x);
         // init last pos (dùng nếu bật auto update mỗi frame)
         _lastVisualPos = transform.position;
 
@@ -395,31 +394,32 @@ public class Boss : MonoBehaviour
     /// Cơ chế giống FishMovement.UpdateVisual: flip X theo hướng, tilt theo Y, scale theo fish.size.
     /// Gọi hàm này sau khi di chuyển boss 1 lần (tốt nhất: capture oldPos -> move -> gọi UpdateVisualFromDelta(newPos - oldPos)).
     /// </summary>
-    /// <summary>
-    /// Cập nhật visual của boss dựa vào delta movement (newPos - oldPos).
-    /// Giữ nguyên scale gốc (không phóng to/nhỏ), chỉ flip X (đổi dấu) và tilt Z.
-    /// </summary>
     public void UpdateVisualFromDelta(Vector3 delta)
     {
+        float currentSize = (fish != null) ? fish.size : 1f;
         Vector2 moveDir = new Vector2(delta.x, delta.y);
 
-        // Nếu gần như đứng yên: chỉ reset tilt dần về 0, giữ nguyên scale gốc
-        if (moveDir.sqrMagnitude < 0.0001f)
+        // nếu đứng yên → reset tilt dần dần
+        if (moveDir.magnitude < 0.001f)
         {
             Quaternion targetRot = Quaternion.Euler(0f, 0f, 0f);
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRot, tiltLerpSpeed * Time.deltaTime);
+
+            // giữ flip cũ
+            transform.localScale = new Vector3(transform.localScale.x, currentSize, currentSize);
             return;
         }
 
-        // Flip X theo hướng di chuyển
-        if (Mathf.Abs(moveDir.x) > 0.01f) // deadzone nhỏ để tránh giật
+        // 🔥 Flip ngay khi delta.x vượt ngưỡng rất nhỏ
+        if (Mathf.Abs(moveDir.x) > 0.01f)
         {
-            Vector3 s = transform.localScale;
-            s.x = Mathf.Abs(s.x) * Mathf.Sign(moveDir.x); // chỉ đổi dấu X, giữ nguyên Y/Z
-            transform.localScale = s;
+            float signX = Mathf.Sign(moveDir.x);
+            transform.localScale = new Vector3(signX * baseScaleX * currentSize,
+                                            currentSize,
+                                            currentSize);
         }
 
-        // Tilt theo hướng dọc
+        // tilt theo hướng Y
         float yRatio = moveDir.y / moveDir.magnitude;
         float tiltThreshold = 0.3f;
         float targetTilt = 0f;
@@ -430,17 +430,13 @@ public class Boss : MonoBehaviour
             targetTilt = Mathf.Clamp(normalizedY * maxTiltAngle * Mathf.Sign(moveDir.y), -maxTiltAngle, maxTiltAngle);
         }
 
-        // tilt đi theo hướng flip
-        float signForTilt = Mathf.Sign(transform.localScale.x);
-        targetTilt *= signForTilt;
+        // tilt theo flip
+        float flipSign = Mathf.Sign(transform.localScale.x);
+        targetTilt *= flipSign;
 
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetTilt);
         transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, tiltLerpSpeed * Time.deltaTime);
     }
-
-
-
-
 
 
 
