@@ -103,7 +103,7 @@ MonoBehaviour:
   inEnragedPhase: 0
   allowPhaseTransition: 1
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 19
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -115,6 +115,9 @@ MonoBehaviour:
   animator: {fileID: 0}
   moveSpeed: 4
   chaseLureSpeed: 5
+  dashOvershootDistance: 1
+  dashOvershootDuration: 0.15
+  preDashDelay: 0.2
   phase1DashCount: 3
   phase1DashDistance: 5
   phase1DashDuration: 1

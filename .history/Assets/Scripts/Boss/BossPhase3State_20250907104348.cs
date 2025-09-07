@@ -17,9 +17,6 @@ public class BossPhase3State : IBossState
     // lưu bombs để kiểm tra collision / dọn khi thoát
     private List<GameObject> spawnedBombs = new List<GameObject>();
 
-    // lock để tránh spawn meat nhiều lần liên tiếp nếu nhiều bomb va chạm gần nhau
-    private bool meatSpawnLock = false;
-
     public void Enter(Boss boss)
     {
         // hunger reset...
@@ -34,6 +31,7 @@ public class BossPhase3State : IBossState
         // ✅ chỉ làm setup 1 lần ở Enter
         routine = boss.StartCoroutine(Phase3Setup(boss));
     }
+
 
     public void Update(Boss boss) { }
 
@@ -58,7 +56,7 @@ public class BossPhase3State : IBossState
             var player = GameObject.FindWithTag("Player");
             Vector3 target = (player != null) ? player.transform.position : boss.transform.position;
 
-            // Gọi dash routine chung (boss.DashRoutine là phương thức chung do bạn đã thêm)
+            // Gọi dash routine chung
             yield return boss.StartCoroutine(
                 boss.DashRoutine(target, boss.phase3DashDistance, boss.phase3DashDuration)
             );
@@ -74,6 +72,10 @@ public class BossPhase3State : IBossState
         }
     }
 
+
+
+
+
     // helper: move boss to a target position with speed
     private IEnumerator MoveTo(Boss boss, Vector3 target, float speed)
     {
@@ -84,6 +86,9 @@ public class BossPhase3State : IBossState
         }
     }
 
+    // Spawns bombs at two vertical columns (left/right) then moves them to circle positions.
+    // Spawns bombs at two vertical columns (left/right) then moves them to circle positions.
+    // Spawns bombs at two vertical columns (left/right) then moves them to circle positions.
     // Spawns bombs at two vertical columns (left/right) then moves them into a circle around center
     private void SpawnAndArrangeBombs(Boss boss, Vector3 center)
     {
@@ -172,6 +177,7 @@ public class BossPhase3State : IBossState
             boss.StartCoroutine(MoveBombTo(b, rightTargets[i], boss.phase3BombMoveDuration));
         }
     }
+
 
     private IEnumerator MoveBombTo(GameObject bomb, Vector3 target, float duration)
     {
@@ -287,30 +293,11 @@ public class BossPhase3State : IBossState
         }
     }
 
-    /// <summary>
-    /// API an toàn để được gọi bởi Phase3Bomb khi bomb chạm boss.
-    /// Bảo đảm chỉ spawn meat 1 lần trong khoảng nhỏ (debounce).
-    /// </summary>
-    public void TryHandleBombHit(Boss boss)
-    {
-        if (meatSpawnLock) return;
-
-        meatSpawnLock = true;
-
-        // spawn meat
-        SpawnMeatOnBombHit(boss);
-
-        // start Phase3AfterStun (boss sẽ ăn thịt, sau đó mới reset lock)
-        boss.StartCoroutine(Phase3AfterStun(boss));
-    }
 
 
-    private IEnumerator ResetMeatSpawnLockCoroutine()
-    {
-        // 0.15s đủ ngắn để ngăn double-spawn từ các bomb gần nhau
-        yield return new WaitForSeconds(0.15f);
-        meatSpawnLock = false;
-    }
+
+
+
 
     public IEnumerator Phase3AfterStun(Boss boss)
     {
@@ -330,12 +317,11 @@ public class BossPhase3State : IBossState
         // ✅ mở khóa phase chuyển sau khi ăn xong
         boss.allowPhaseTransition = true;
 
-        // 🔑 mở khóa nhận dame/bomb lại
-        meatSpawnLock = false;
-
         // tiếp tục dash player
         routine = boss.StartCoroutine(Phase3DashLoop(boss));
     }
+
+
 
 
     private IEnumerator EatAllMeat(Boss boss)
@@ -370,7 +356,6 @@ public class BossPhase3State : IBossState
             yield return null;
         }
     }
-
     private IEnumerator Phase3Setup(Boss boss)
     {
         var map = Object.FindObjectOfType<MapManager>();
@@ -390,5 +375,7 @@ public class BossPhase3State : IBossState
 
         // ✅ Sau đó chỉ còn dash loop
         routine = boss.StartCoroutine(Phase3DashLoop(boss));
-    }
+}
+
+
 }

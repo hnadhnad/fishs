@@ -330,13 +330,9 @@ public class BossPhase3State : IBossState
         // ✅ mở khóa phase chuyển sau khi ăn xong
         boss.allowPhaseTransition = true;
 
-        // 🔑 mở khóa nhận dame/bomb lại
-        meatSpawnLock = false;
-
         // tiếp tục dash player
         routine = boss.StartCoroutine(Phase3DashLoop(boss));
     }
-
 
     private IEnumerator EatAllMeat(Boss boss)
     {

@@ -297,13 +297,15 @@ public class BossPhase3State : IBossState
 
         meatSpawnLock = true;
 
-        // spawn meat
+        // spawn meat (sẽ không spawn nếu lock đang trên)
         SpawnMeatOnBombHit(boss);
 
-        // start Phase3AfterStun (boss sẽ ăn thịt, sau đó mới reset lock)
+        // start Phase3AfterStun (boss sẽ đợi stun, ăn thịt rồi quay lại)
         boss.StartCoroutine(Phase3AfterStun(boss));
-    }
 
+        // reset lock sau ngắn (phòng trường hợp bomb khác cùng lúc)
+        boss.StartCoroutine(ResetMeatSpawnLockCoroutine());
+    }
 
     private IEnumerator ResetMeatSpawnLockCoroutine()
     {
@@ -330,13 +332,9 @@ public class BossPhase3State : IBossState
         // ✅ mở khóa phase chuyển sau khi ăn xong
         boss.allowPhaseTransition = true;
 
-        // 🔑 mở khóa nhận dame/bomb lại
-        meatSpawnLock = false;
-
         // tiếp tục dash player
         routine = boss.StartCoroutine(Phase3DashLoop(boss));
     }
-
 
     private IEnumerator EatAllMeat(Boss boss)
     {

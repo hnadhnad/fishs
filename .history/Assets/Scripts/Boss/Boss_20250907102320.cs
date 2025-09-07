@@ -44,9 +44,6 @@ public class Boss : MonoBehaviour
     [Tooltip("Thời gian thực hiện overshoot sau dash")]
     public float dashOvershootDuration = 0.15f;
 
-    public float preDashDelay = 0.2f;
-
-
 
 
     // ================= PHASE 1 =================
@@ -211,6 +208,13 @@ public class Boss : MonoBehaviour
     private Vector3 _lastVisualPos;
 
     public float flipDeadzoneX = 0.01f; // public để chỉnh trong Inspector nếu cần
+
+
+
+
+
+
+
 
 
 
@@ -446,48 +450,57 @@ public class Boss : MonoBehaviour
     /// Dash từ vị trí hiện tại về phía target với Ease-out + Overshoot.
     /// Có thể dùng chung cho mọi phase.
     /// </summary>
-    public IEnumerator DashRoutine(
-        Vector3 targetPos,
-        float distance,
-        float duration,
-        float impactPause = 0f
-    )
+    public IEnumerator DashRoutine(Vector3 target, float dashDistance, float dashDuration)
     {
-        // --- 1. Chuẩn bị trước khi dash ---
-        if (preDashDelay > 0f)
-        {
-            float tWait = 0f;
-            while (tWait < preDashDelay)
-            {
-                tWait += Time.deltaTime;
-                // 🔥 Boss đứng yên → play animation/hitbox cảnh báo ở đây
-                yield return null;
-            }
-        }
+        if (animator != null)
+            animator.SetTrigger("Dash"); // Hook animation (tùy bạn)
 
-        // --- 2. Dash thật sự ---
         Vector3 start = transform.position;
-        Vector3 dir = (targetPos - start).normalized;
-        Vector3 end = start + dir * distance;
 
-        float t = 0f;
-        while (t < 1f)
+        // Xác định hướng và điểm kết thúc (endPoint)
+        Vector3 dir = (target - start).normalized;
+        Vector3 endPoint = start + dir * dashDistance;
+
+        float elapsed = 0f;
+
+        // Dash chính (Ease-out: nhanh -> chậm dần)
+        while (elapsed < dashDuration)
         {
-            t += Time.deltaTime / Mathf.Max(0.0001f, duration);
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / dashDuration);
 
-            // Ease-out với overshoot nhẹ
-            float easedT = Mathf.Sin(t * Mathf.PI * 0.5f);
-            Vector3 overshoot = end + dir * 0.2f;
-            transform.position = Vector3.LerpUnclamped(start, overshoot, easedT);
+            // ease-out quad: 1 - (1 - t)^2
+            float easeT = 1f - Mathf.Pow(1f - t, 2f);
+
+            Vector3 oldPos = transform.position;
+            transform.position = Vector3.Lerp(start, endPoint, easeT);
+            UpdateVisualFromDelta(transform.position - oldPos);
 
             yield return null;
         }
 
-        // --- 3. Pause sau va chạm ---
-        if (impactPause > 0f)
-            yield return new WaitForSeconds(impactPause);
-    }
+        // Overshoot (nếu có)
+        if (dashOvershootDistance > 0f && dashOvershootDuration > 0f)
+        {
+            Vector3 overshootEnd = endPoint + dir * dashOvershootDistance;
+            elapsed = 0f;
 
+            while (elapsed < dashOvershootDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / dashOvershootDuration);
+
+                // ease-out overshoot
+                float easeT = 1f - Mathf.Pow(1f - t, 2f);
+
+                Vector3 oldPos = transform.position;
+                transform.position = Vector3.Lerp(endPoint, overshootEnd, easeT);
+                UpdateVisualFromDelta(transform.position - oldPos);
+
+                yield return null;
+            }
+        }
+    }
 
 
 

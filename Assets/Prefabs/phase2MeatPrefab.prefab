@@ -176,13 +176,14 @@ MonoBehaviour:
   isAlgae: 0
   isBoss: 0
   isLure: 0
-  scoreValue: 10
+  scoreValue: 0
   size: 0.9
   eatSound: {fileID: 0}
   eatVfxPrefab: {fileID: 0}
   despawnMargin: 1
   spawnGraceTime: 1.5
   hungerValue: 10
+  wasSavedByShield: 0
 --- !u!114 &-4632028836497890928
 MonoBehaviour:
   m_ObjectHideFlags: 0
