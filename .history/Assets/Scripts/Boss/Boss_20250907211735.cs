@@ -306,7 +306,7 @@ public class Boss : MonoBehaviour
 
     void HandlePhaseLogic()
     {
-        if (!allowPhaseTransition) return;
+        if (!allowPhaseTransition) return; // 🚫 không cho chuyển phase nếu đang ăn thịt
 
         if (currentHealth <= maxHealth * 0.2f)
         {
@@ -315,18 +315,15 @@ public class Boss : MonoBehaviour
         }
         else if (currentHealth <= maxHealth * 0.5f)
         {
-            // chỉ vào Phase3 nếu hiện tại chưa phải Phase3 hoặc Enraged
-            if (!(currentState is BossPhase3State) && !(currentState is BossEnragedState))
+            if (!(currentState is BossPhase3State))
                 ChangeState(new BossPhase3State());
         }
         else if (currentHealth <= maxHealth * 0.7f)
         {
-            // chỉ vào Phase2 nếu hiện tại vẫn đang ở Phase1
-            if (currentState is BossPhase1State)
+            if (!(currentState is BossPhase2State))
                 ChangeState(new BossPhase2State());
         }
     }
-
 
 
     public void ChangeState(IBossState newState)

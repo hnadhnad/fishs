@@ -56,9 +56,6 @@ public class Fish : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
-        animator = GetComponent<Animator>(); // ✅ lấy Animator nếu có
-
-
         ApplyScale();
 
         mapManager = FindObjectOfType<MapManager>();
@@ -106,11 +103,6 @@ public class Fish : MonoBehaviour
         if (boss != null && otherFish.isPlayer)
         {
             Fish playerFish = otherFish.GetComponent<Fish>();
-
-            if (animator != null)
-            {
-                animator.SetTrigger("Eat"); // trong Animator phải tạo Trigger "Eat"
-            }
 
             // Nếu player có khiên thì đừng giết luôn
             if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
@@ -165,12 +157,6 @@ public class Fish : MonoBehaviour
                 {
                     PlayerHunger.Instance.GainHunger(prey.hungerValue);
                 }
-            }
-
-            // ✅ Trigger animation nuốt
-            if (animator != null)
-            {
-                animator.SetTrigger("Eat"); // trong Animator phải tạo Trigger "Eat"
             }
 
             prey.StartCoroutine(prey.ShrinkAndDie(this));

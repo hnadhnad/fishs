@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2730225544251596432}
   - component: {fileID: 8974496444987411034}
   - component: {fileID: 1501234706856575140}
+  - component: {fileID: 3682435607562554826}
+  - component: {fileID: 3408274061057748714}
   m_Layer: 0
   m_Name: HeartPrefab
   m_TagString: Untagged
@@ -143,3 +145,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbea393d75cb2bb4fa07cacf32ffdce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!50 &3682435607562554826
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4888898023618154534}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &3408274061057748714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4888898023618154534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52ea4a44487c9b469c98d8f82f45226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPlayer: 0
+  isAlgae: 0
+  isBoss: 0
+  isLure: 0
+  scoreValue: 10
+  size: 1
+  eatSound: {fileID: 0}
+  eatVfxPrefab: {fileID: 0}
+  despawnMargin: 1
+  spawnGraceTime: 1.5
+  hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
+  wasSavedByShield: 0

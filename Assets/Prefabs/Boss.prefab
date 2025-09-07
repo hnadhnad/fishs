@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -5547849903450833211}
   - component: {fileID: -7149866065945544494}
   - component: {fileID: 1407351014704663346}
+  - component: {fileID: 4644668254254783040}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Untagged
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 294036c2983caf74586b8324f1ca632f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
@@ -103,7 +104,7 @@ MonoBehaviour:
   inEnragedPhase: 0
   allowPhaseTransition: 1
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 49
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -289,3 +290,24 @@ MonoBehaviour:
   bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
   wasEaten: 0
   wasSavedByShield: 0
+--- !u!95 &4644668254254783040
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5037481844905245412}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 948d030a970260b44aa488464be57b68, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

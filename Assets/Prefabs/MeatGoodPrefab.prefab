@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -8652014349861337307}
   - component: {fileID: 8460938505447661533}
   - component: {fileID: -903177353613487230}
+  - component: {fileID: 2541152145356362744}
   m_Layer: 0
   m_Name: MeatGoodPrefab
   m_TagString: Untagged
@@ -162,3 +163,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hungerRestore: 10
+--- !u!114 &2541152145356362744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2215705058270352124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52ea4a44487c9b469c98d8f82f45226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPlayer: 0
+  isAlgae: 0
+  isBoss: 0
+  isLure: 0
+  scoreValue: 10
+  size: 1
+  eatSound: {fileID: 0}
+  eatVfxPrefab: {fileID: 0}
+  despawnMargin: 1
+  spawnGraceTime: 1.5
+  hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
+  wasSavedByShield: 0

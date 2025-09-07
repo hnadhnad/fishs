@@ -306,7 +306,7 @@ public class Boss : MonoBehaviour
 
     void HandlePhaseLogic()
     {
-        if (!allowPhaseTransition) return;
+        if (!allowPhaseTransition) return; // 🚫 không cho chuyển phase nếu đang ăn thịt
 
         if (currentHealth <= maxHealth * 0.2f)
         {
@@ -315,18 +315,15 @@ public class Boss : MonoBehaviour
         }
         else if (currentHealth <= maxHealth * 0.5f)
         {
-            // chỉ vào Phase3 nếu hiện tại chưa phải Phase3 hoặc Enraged
-            if (!(currentState is BossPhase3State) && !(currentState is BossEnragedState))
+            if (!(currentState is BossPhase3State))
                 ChangeState(new BossPhase3State());
         }
         else if (currentHealth <= maxHealth * 0.7f)
         {
-            // chỉ vào Phase2 nếu hiện tại vẫn đang ở Phase1
-            if (currentState is BossPhase1State)
+            if (!(currentState is BossPhase2State))
                 ChangeState(new BossPhase2State());
         }
     }
-
 
 
     public void ChangeState(IBossState newState)
@@ -463,27 +460,19 @@ public class Boss : MonoBehaviour
             while (tWait < preDashDelay)
             {
                 tWait += Time.deltaTime;
+                // 🔥 Boss đứng yên → play animation/hitbox cảnh báo ở đây
                 yield return null;
             }
         }
 
         // --- 2. Dash thật sự ---
-        Vector3 start = transform.position;
-        Vector3 dir = (targetPos - start).normalized;
-        Vector3 end = start + dir * distance;
-
-        // 🔥 Bật animation Eat và scale speed theo dashDuration
         if (animator != null)
         {
             animator.SetTrigger("Eat");
-
-            // Lấy info animation clip hiện tại
-            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-            float animLength = state.length > 0 ? state.length : 0.2f;
-
-            // Tính hệ số speed để animation khớp với dash duration
-            animator.speed = animLength / Mathf.Max(0.0001f, duration);
         }
+        Vector3 start = transform.position;
+        Vector3 dir = (targetPos - start).normalized;
+        Vector3 end = start + dir * distance;
 
         float t = 0f;
         while (t < 1f)
@@ -498,15 +487,10 @@ public class Boss : MonoBehaviour
             yield return null;
         }
 
-        // Reset animator speed về bình thường
-        if (animator != null)
-            animator.speed = 1f;
-
         // --- 3. Pause sau va chạm ---
         if (impactPause > 0f)
             yield return new WaitForSeconds(impactPause);
     }
-
 
 
 

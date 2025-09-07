@@ -107,11 +107,6 @@ public class Fish : MonoBehaviour
         {
             Fish playerFish = otherFish.GetComponent<Fish>();
 
-            if (animator != null)
-            {
-                animator.SetTrigger("Eat"); // trong Animator phải tạo Trigger "Eat"
-            }
-
             // Nếu player có khiên thì đừng giết luôn
             if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
             {
