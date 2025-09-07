@@ -103,7 +103,7 @@ MonoBehaviour:
   inEnragedPhase: 0
   allowPhaseTransition: 1
   maxHealth: 100
-  currentHealth: 19
+  currentHealth: 0
   maxHunger: 100
   currentHunger: 0
   hungerDecayRate: 10
@@ -114,13 +114,13 @@ MonoBehaviour:
   fish: {fileID: 0}
   animator: {fileID: 0}
   moveSpeed: 4
-  chaseLureSpeed: 5
+  chaseLureSpeed: 6
   dashOvershootDistance: 1
   dashOvershootDuration: 0.15
   preDashDelay: 0.2
-  phase1DashCount: 3
-  phase1DashDistance: 5
-  phase1DashDuration: 1
+  phase1DashCount: 1
+  phase1DashDistance: 7
+  phase1DashDuration: 1.5
   phase1DashInterval: 1
   phase1DashImpactPause: 0.12
   phase1BulletPrefab: {fileID: 1547457209301159574, guid: a6a246ab37bd18a4fb9ee432871b8293, type: 3}
@@ -286,4 +286,6 @@ MonoBehaviour:
   despawnMargin: 1
   spawnGraceTime: 1.5
   hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
   wasSavedByShield: 0

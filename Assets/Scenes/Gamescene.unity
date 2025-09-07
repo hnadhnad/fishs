@@ -882,6 +882,7 @@ MonoBehaviour:
   maxSkillDrafts: 3
   bossPrefab: {fileID: 5037481844905245412, guid: 168f34fa4c7d69143bed3d3809889271, type: 3}
   bossSpawnPos: {x: 0, y: 7}
+  spawnBossOnStart: 1
 --- !u!4 &521525957
 Transform:
   m_ObjectHideFlags: 0
@@ -1648,7 +1649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d98eba1a5f2674a49b85904533cc10c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alwaysUnlockShield: 1
+  alwaysUnlockShield: 0
 --- !u!4 &723887129
 Transform:
   m_ObjectHideFlags: 0
@@ -3140,6 +3141,8 @@ MonoBehaviour:
   despawnMargin: 1
   spawnGraceTime: 0.5
   hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
   wasSavedByShield: 0
 --- !u!114 &1759270720
 MonoBehaviour:

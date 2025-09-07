@@ -65,18 +65,15 @@ public class LureFish : MonoBehaviour
             // Boss ăn lure → hồi Hunger
             boss.currentHunger = Mathf.Min(boss.currentHunger + boss.phase1LureHealAmount, boss.maxHunger);
 
-            // Boss ăn lure qua hệ thống Fish (Shrink + particle)
+            // Boss cũng ăn lure qua hệ thống Fish (Shrink + particle)
             var bossFish = boss.GetComponent<Fish>();
             var lureFish = GetComponent<Fish>();
             if (bossFish != null && lureFish != null)
             {
                 bossFish.Eat(lureFish);
-                if (lureFish.bloodVfxPrefab != null)
-                    Instantiate(lureFish.bloodVfxPrefab, lureFish.transform.position, Quaternion.identity);
             }
             return;
         }
     }
-
 
 }

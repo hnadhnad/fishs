@@ -164,6 +164,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPlayer: 0
   isAlgae: 0
+  isBoss: 0
+  isLure: 0
   scoreValue: 10
   size: 1.5
   eatSound: {fileID: 0}
@@ -171,6 +173,9 @@ MonoBehaviour:
   despawnMargin: 1
   spawnGraceTime: 1.5
   hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
+  wasSavedByShield: 0
 --- !u!114 &-3703391389500563047
 MonoBehaviour:
   m_ObjectHideFlags: 0

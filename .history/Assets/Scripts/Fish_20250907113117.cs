@@ -38,11 +38,6 @@ public class Fish : MonoBehaviour
     [Tooltip("Độ no mà con cá này cung cấp cho cá người chơi khi bị ăn")]
     public float hungerValue = 10f;
 
-    public GameObject bloodVfxPrefab;
-    [HideInInspector] public bool wasEaten = false;
-
-
-
     // ---- internal ----
     protected Rigidbody2D rb;
     protected Collider2D col;
@@ -100,23 +95,10 @@ public class Fish : MonoBehaviour
         Boss boss = GetComponent<Boss>();
         if (boss != null && otherFish.isPlayer)
         {
-            Fish playerFish = otherFish.GetComponent<Fish>();
-
-            // Nếu player có khiên thì đừng giết luôn
-            if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
-            {
-                playerFish.wasSavedByShield = true;
-                SkillManager.Instance.ConsumeShield();
-                Debug.Log("Player được cứu bởi Shield, không bị Boss ăn!");
-            }
-            else
-            {
-                // Không có khiên → player chết như bình thường
-                playerFish.Die();
-            }
+            // Boss luôn ăn được player
+            otherFish.Die();
             return;
         }
-
 
         // Nếu cùng size thì không ai ăn ai
         if (Mathf.Approximately(this.size, otherFish.size)) return;
@@ -128,7 +110,7 @@ public class Fish : MonoBehaviour
     }
 
 
-    public virtual void Eat(Fish prey)
+    protected virtual void Eat(Fish prey)
     {
         if (prey == null) return;
 
@@ -157,9 +139,7 @@ public class Fish : MonoBehaviour
                 }
             }
 
-            prey.StartCoroutine(prey.ShrinkAndDie(this));
-            prey.wasEaten = true;
-
+            prey.Die(); // ✅ gọi Die() thay vì Destroy trực tiếp
         }
 
         // Nếu prey là algae thì xử lý VFX/score ở đây
@@ -200,67 +180,51 @@ public class Fish : MonoBehaviour
     {
         if (isPlayer)
         {
+            // ✅ Check shield trước khi chết
             if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
             {
+                // mark rằng player vừa được cứu (để các logic khác biết)
                 wasSavedByShield = true;
+
+                // tiêu thụ khiên
                 SkillManager.Instance.ConsumeShield();
+
                 Debug.Log("Player được cứu bởi Shield, không chết!");
-                return;
+                return; // không die
             }
 
             Debug.Log("Player chết!");
 
+            // VFX chết
             if (eatVfxPrefab != null)
                 Instantiate(eatVfxPrefab, transform.position, Quaternion.identity);
 
-            // ✅ Spawn máu chỉ khi không phải bị ăn
-            if (!wasEaten && bloodVfxPrefab != null)
-                Instantiate(bloodVfxPrefab, transform.position, Quaternion.identity);
-
+            // SFX chết
             if (eatSound != null)
                 AudioSource.PlayClipAtPoint(eatSound, Camera.main.transform.position);
         }
 
         Destroy(gameObject);
     }
-
-
-    private IEnumerator ShrinkAndDie(Fish eater)
+    private IEnumerator ShrinkAndDestroy()
     {
-        float duration = 0.15f; // nhanh, gọn
+        float duration = 0.15f; // rất nhanh ~150ms
         float t = 0f;
-
         Vector3 startScale = transform.localScale;
-        Vector3 startPos = transform.position;   // vị trí ban đầu (để spawn máu)
-        Vector3 targetPos = eater.transform.position; // hút về phía cá ăn
 
-        // tắt collider để không va chạm lung tung
+        // disable collider ngay để tránh va chạm trong lúc shrink
         if (col != null) col.enabled = false;
-        if (rb != null) rb.simulated = false;
 
-        while (t < 1f)
+        while (t < duration)
         {
-            t += Time.deltaTime / duration;
-
-            // scale nhỏ dần
-            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
-
-            // di chuyển dần về phía eater
-            transform.position = Vector3.Lerp(startPos, targetPos, t);
-
+            t += Time.deltaTime;
+            float k = 1f - (t / duration); // từ 1 → 0
+            transform.localScale = startScale * k;
             yield return null;
-        }
-
-        // ✅ spawn particle máu sau khi bị nuốt xong
-        if (bloodVfxPrefab != null)
-        {
-            Instantiate(bloodVfxPrefab, startPos, Quaternion.identity);
         }
 
         Destroy(gameObject);
     }
-
-
 
 
 

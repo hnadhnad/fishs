@@ -54,10 +54,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if (spawnBossOnStart)
-        {
-            SpawnBoss();
-        }
+        SpawnBoss();
 
         // PlayerFish khởi đầu giữ nguyên size mặc định (set trong prefab / inspector)
         if (scoreText != null) scoreText.text = $"Score: {currentScore}";
@@ -70,7 +67,6 @@ public class GameManager : MonoBehaviour
 
         SetupMilestones();
     }
-
 
     public void AddScore(int amount)
     {

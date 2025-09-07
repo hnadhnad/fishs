@@ -47,9 +47,6 @@ public class MeatPiece : MonoBehaviour
             if (bossFish != null && meatFish != null)
             {
                 bossFish.Eat(meatFish);  // ✅ Boss ăn thịt qua Fish system
-                // 👇 ép spawn máu ngay tại chỗ ăn
-                if (meatFish.bloodVfxPrefab != null)
-                    Instantiate(meatFish.bloodVfxPrefab, meatFish.transform.position, Quaternion.identity);
             }
         }
 

@@ -71,8 +71,6 @@ public class LureFish : MonoBehaviour
             if (bossFish != null && lureFish != null)
             {
                 bossFish.Eat(lureFish);
-                if (lureFish.bloodVfxPrefab != null)
-                    Instantiate(lureFish.bloodVfxPrefab, lureFish.transform.position, Quaternion.identity);
             }
             return;
         }

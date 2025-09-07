@@ -39,8 +39,6 @@ public class Fish : MonoBehaviour
     public float hungerValue = 10f;
 
     public GameObject bloodVfxPrefab;
-    [HideInInspector] public bool wasEaten = false;
-
 
 
     // ---- internal ----
@@ -100,23 +98,10 @@ public class Fish : MonoBehaviour
         Boss boss = GetComponent<Boss>();
         if (boss != null && otherFish.isPlayer)
         {
-            Fish playerFish = otherFish.GetComponent<Fish>();
-
-            // Nếu player có khiên thì đừng giết luôn
-            if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
-            {
-                playerFish.wasSavedByShield = true;
-                SkillManager.Instance.ConsumeShield();
-                Debug.Log("Player được cứu bởi Shield, không bị Boss ăn!");
-            }
-            else
-            {
-                // Không có khiên → player chết như bình thường
-                playerFish.Die();
-            }
+            // Boss luôn ăn được player
+            otherFish.StartCoroutine(otherFish.ShrinkAndDie(this));
             return;
         }
-
 
         // Nếu cùng size thì không ai ăn ai
         if (Mathf.Approximately(this.size, otherFish.size)) return;
@@ -128,7 +113,7 @@ public class Fish : MonoBehaviour
     }
 
 
-    public virtual void Eat(Fish prey)
+    protected virtual void Eat(Fish prey)
     {
         if (prey == null) return;
 
@@ -158,8 +143,6 @@ public class Fish : MonoBehaviour
             }
 
             prey.StartCoroutine(prey.ShrinkAndDie(this));
-            prey.wasEaten = true;
-
         }
 
         // Nếu prey là algae thì xử lý VFX/score ở đây
@@ -200,31 +183,32 @@ public class Fish : MonoBehaviour
     {
         if (isPlayer)
         {
+            // ✅ Check shield trước khi chết
             if (SkillManager.Instance != null && SkillManager.Instance.HasShield())
             {
+                // mark rằng player vừa được cứu (để các logic khác biết)
                 wasSavedByShield = true;
+
+                // tiêu thụ khiên
                 SkillManager.Instance.ConsumeShield();
+
                 Debug.Log("Player được cứu bởi Shield, không chết!");
-                return;
+                return; // không die
             }
 
             Debug.Log("Player chết!");
 
+            // VFX chết
             if (eatVfxPrefab != null)
                 Instantiate(eatVfxPrefab, transform.position, Quaternion.identity);
 
-            // ✅ Spawn máu chỉ khi không phải bị ăn
-            if (!wasEaten && bloodVfxPrefab != null)
-                Instantiate(bloodVfxPrefab, transform.position, Quaternion.identity);
-
+            // SFX chết
             if (eatSound != null)
                 AudioSource.PlayClipAtPoint(eatSound, Camera.main.transform.position);
         }
 
         Destroy(gameObject);
     }
-
-
     private IEnumerator ShrinkAndDie(Fish eater)
     {
         float duration = 0.15f; // nhanh, gọn

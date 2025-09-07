@@ -183,6 +183,8 @@ MonoBehaviour:
   despawnMargin: 1
   spawnGraceTime: 1.5
   hungerValue: 10
+  bloodVfxPrefab: {fileID: 6051038501016799146, guid: 1aec5c140418264479c43536c69d142d, type: 3}
+  wasEaten: 0
   wasSavedByShield: 0
 --- !u!114 &-4632028836497890928
 MonoBehaviour:

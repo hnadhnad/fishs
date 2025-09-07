@@ -128,7 +128,7 @@ public class Fish : MonoBehaviour
     }
 
 
-    public virtual void Eat(Fish prey)
+    protected virtual void Eat(Fish prey)
     {
         if (prey == null) return;
 

@@ -42,18 +42,15 @@ public class MeatPiece : MonoBehaviour
         {
             boss.currentHealth = Mathf.Min(boss.maxHealth, boss.currentHealth + healAmount);
 
-            var bossFish = boss.GetComponent<Fish>();   // Boss cũng có Fish
-            var meatFish = GetComponent<Fish>();        // Miếng thịt có Fish
-            if (bossFish != null && meatFish != null)
+            // Boss cũng ăn thịt qua hệ thống Fish (Shrink + particle)
+            var meatFish = GetComponent<Fish>();
+            if (meatFish != null)
             {
-                bossFish.Eat(meatFish);  // ✅ Boss ăn thịt qua Fish system
-                // 👇 ép spawn máu ngay tại chỗ ăn
-                if (meatFish.bloodVfxPrefab != null)
-                    Instantiate(meatFish.bloodVfxPrefab, meatFish.transform.position, Quaternion.identity);
+                if (meatFish.eatVfxPrefab != null) Instantiate(meatFish.eatVfxPrefab, transform.position, Quaternion.identity);
+                boss.SendMessage("Eat", meatFish);
             }
+            return;
         }
-
-
     }
 
 }
